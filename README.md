@@ -36,6 +36,7 @@ pip install git+https://gitee.com/project_hub_1/codingplan.git
 cd codingplan
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e .
+# 或使用脚本: bash scripts/install-from-repo.sh
 ```
 
 ### 方式三：curl 一键安装
@@ -55,9 +56,24 @@ export PATH="$HOME/.local/bin:$PATH"
 ```bash
 brew tap project_hub_1/homebrew-codingplan https://gitee.com/project_hub_1/homebrew-codingplan
 brew install codingplan
+# 若尚未发布 tag，可使用: brew install codingplan --HEAD
 ```
 
 需先创建 [homebrew-codingplan](https://gitee.com/project_hub_1/homebrew-codingplan) 仓库并放入 Formula，详见 [发布说明](docs/PUBLISH.md)。
+
+### 安装方式说明
+
+| 方式 | 说明 | 状态 |
+|------|------|------|
+| **方式一** | pip/pipx 安装，`pyproject.toml` 已配置 | ✅ |
+| **方式二** | 本地开发安装，`scripts/install-from-repo.sh` 自动创建 venv | ✅ |
+| **方式三** | curl 一键安装，`install.sh` 克隆仓库并安装到 `~/.local/bin` | ✅ |
+| **方式四** | Homebrew，Formula 支持 `--HEAD` 从 main 安装 | ✅ |
+
+**后续步骤**：
+- **PyPI**：执行 `./scripts/publish-pypi.sh` 发布后，可使用 `pip install codingplan`
+- **Homebrew**：创建 `homebrew-codingplan` 仓库，运行 `./scripts/prepare-homebrew-tap.sh` 生成 Formula 并推送
+- **Gitee**：发布 tag 后，在 Formula 中更新 `url` 和 `sha256`，以支持 `brew install codingplan`（非 `--HEAD`）
 
 ## 使用
 
@@ -70,7 +86,21 @@ codingplan ./requirements --resume
 
 # 仅处理单个文件
 codingplan ./requirements -f feature-a.md
+
+# 实现范围限制：仅在此目录内实现/修改代码（如 ugc_kmp），其他目录不修改
+codingplan ./requirements -s ugc_kmp
 ```
+
+### 实现范围限制（--scope / -s）
+
+当项目为多端结构（如后端、管理后台、多个客户端）且只需实现其中一端时，可使用 `-s` 限制实现范围：
+
+```bash
+# 仅限在 ugc_kmp 目录内实现，不修改 ugc_backend、ugc_admin、ugc_flutter 等
+codingplan ./requirements -s ugc_kmp
+```
+
+工具会在设计、实现、测试、编译等各阶段约束 Agent 仅修改指定目录内的代码。
 
 ### 目录约定
 

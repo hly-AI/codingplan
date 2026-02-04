@@ -93,6 +93,7 @@ shasum -a 256 /tmp/codingplan.tar.gz
 ```bash
 brew tap project_hub_1/homebrew-codingplan https://gitee.com/project_hub_1/homebrew-codingplan
 brew install codingplan
+# 若尚未发布 tag（sha256 未填写），可使用: brew install codingplan --HEAD
 ```
 
 若 Tap 托管在 GitHub，则：

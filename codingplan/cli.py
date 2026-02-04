@@ -18,8 +18,9 @@ def main():
         epilog="""
 示例:
   codingplan ./requirements          # 处理 requirements 目录下所有需求
-  codingplan ./docs/reqs -r          # 从上次中断处继续
+  codingplan ./docs/reqs -r           # 从上次中断处继续
   codingplan ./reqs -f feature-a.md   # 仅处理指定文件
+  codingplan ./reqs -s ugc_kmp        # 仅限在 ugc_kmp 目录内实现
 
 前置条件:
   1. 已安装 Cursor CLI: curl https://cursor.com/install -fsS | bash
@@ -46,6 +47,13 @@ def main():
         help="仅处理指定文件",
     )
     parser.add_argument(
+        "-s", "--scope",
+        dest="scope",
+        type=str,
+        metavar="DIR",
+        help="实现范围限制：仅在此目录内实现/修改代码（如 ugc_kmp），其他目录不修改",
+    )
+    parser.add_argument(
         "-v", "--version",
         action="version",
         version=f"%(prog)s {__version__}",
@@ -69,6 +77,7 @@ def main():
         req_dir=req_dir,
         resume=args.resume,
         single_file=args.single_file,
+        scope=args.scope,
     )
     sys.exit(exit_code)
 

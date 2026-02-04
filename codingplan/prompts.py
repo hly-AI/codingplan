@@ -1,5 +1,21 @@
 """各步骤的 Prompt 模板"""
 
+from typing import Optional
+
+
+def _scope_constraint(scope: Optional[str]) -> str:
+    """生成 scope 限制说明"""
+    if not scope:
+        return ""
+    return f"""
+## 实现范围限制（必须遵守）
+
+**仅限在 {scope}/ 目录内实现和修改代码**。其他目录（如 ugc_backend、ugc_admin、ugc_flutter 等）已有实现，请勿修改。
+- 代码实现、测试代码、编译运行均只针对 {scope}/ 范围内
+- 设计文档应聚焦 {scope}/ 的架构与实现
+"""
+
+
 WORKFLOW_CONTEXT = """
 你正在执行「基于 Cursor CLI 的自动化需求处理闭环流程」。必须遵守以下规则：
 - 任意阶段出现不确定内容，必须写入 uncertain/ 目录
@@ -46,15 +62,16 @@ def step2_complete(file_path: str, req_doc_path: str) -> str:
 """
 
 
-def step3_outline(req_doc_path: str, base_name: str) -> str:
+def step3_outline(req_doc_path: str, base_name: str, scope: Optional[str] = None) -> str:
     """Step 3: 概要设计"""
     return f"""
 {WORKFLOW_CONTEXT}
+{_scope_constraint(scope)}
 
 ## 任务：概要设计
 
 基于需求文档 {req_doc_path}，输出概要设计文档，包括：
-- 系统整体架构
+- 系统整体架构（若指定 scope，聚焦该范围内的架构）
 - 模块划分
 - 核心流程说明
 - 技术选型（如适用）
@@ -65,10 +82,11 @@ def step3_outline(req_doc_path: str, base_name: str) -> str:
 """
 
 
-def step4_detail(outline_path: str, req_path: str, base_name: str) -> str:
+def step4_detail(outline_path: str, req_path: str, base_name: str, scope: Optional[str] = None) -> str:
     """Step 4: 详细设计"""
     return f"""
 {WORKFLOW_CONTEXT}
+{_scope_constraint(scope)}
 
 ## 任务：详细设计
 
@@ -82,10 +100,11 @@ def step4_detail(outline_path: str, req_path: str, base_name: str) -> str:
 """
 
 
-def step5_implement(detail_path: str, req_path: str) -> str:
+def step5_implement(detail_path: str, req_path: str, scope: Optional[str] = None) -> str:
     """Step 5: 基于 Plan 的代码实现"""
     return f"""
 {WORKFLOW_CONTEXT}
+{_scope_constraint(scope)}
 
 ## 任务：代码实现（使用 Plan 模式）
 
@@ -98,10 +117,11 @@ def step5_implement(detail_path: str, req_path: str) -> str:
 """
 
 
-def step6_test_design(req_path: str, detail_path: str, base_name: str) -> str:
+def step6_test_design(req_path: str, detail_path: str, base_name: str, scope: Optional[str] = None) -> str:
     """Step 6: 测试设计"""
     return f"""
 {WORKFLOW_CONTEXT}
+{_scope_constraint(scope)}
 
 ## 任务：测试设计
 
@@ -119,10 +139,11 @@ def step6_test_design(req_path: str, detail_path: str, base_name: str) -> str:
 """
 
 
-def step7_test_impl(test_design_path: str) -> str:
+def step7_test_impl(test_design_path: str, scope: Optional[str] = None) -> str:
     """Step 7: 测试代码实现"""
     return f"""
 {WORKFLOW_CONTEXT}
+{_scope_constraint(scope)}
 
 ## 任务：测试代码实现
 
@@ -130,17 +151,19 @@ def step7_test_impl(test_design_path: str) -> str:
 1. 拆解测试实现步骤
 2. 自动生成单元测试、集成测试（如适用）
 3. 测试代码存放在 tests/ 目录，与被测模块强关联命名
+4. 若指定 scope，仅针对 scope 范围内的模块编写测试
 """
 
 
-def step8_build_test() -> str:
+def step8_build_test(scope: Optional[str] = None) -> str:
     """Step 8: 编译、运行、测试"""
     return f"""
 {WORKFLOW_CONTEXT}
+{_scope_constraint(scope)}
 
 ## 任务：编译、运行、测试
 
-1. 执行项目编译
+1. 执行项目编译（若指定 scope，仅编译 scope 范围内或相关子项目）
 2. 运行项目
 3. 执行测试（强制）
 
@@ -154,14 +177,15 @@ def step8_build_test() -> str:
 """
 
 
-def step9_validate(req_path: str) -> str:
+def step9_validate(req_path: str, scope: Optional[str] = None) -> str:
     """Step 9: 单需求完成度校验"""
     return f"""
 {WORKFLOW_CONTEXT}
+{_scope_constraint(scope)}
 
 ## 任务：完成度校验
 
-检查：
+检查（若指定 scope，仅校验 scope 范围内的实现）：
 - 功能是否实现 100%
 - 核心逻辑是否有测试覆盖
 - 是否存在未验证的关键路径
@@ -174,14 +198,15 @@ def step9_validate(req_path: str) -> str:
 """
 
 
-def step10_project_check() -> str:
+def step10_project_check(scope: Optional[str] = None) -> str:
     """Step 10: 项目整体检查"""
     return f"""
 {WORKFLOW_CONTEXT}
+{_scope_constraint(scope)}
 
 ## 任务：项目整体完成度与全量测试检查
 
-基于项目代码、所有需求文档、设计文档、测试代码，评估：
+基于项目代码、所有需求文档、设计文档、测试代码，评估（若指定 scope，仅评估 scope 范围内）：
 - 是否存在未覆盖需求
 - 是否存在模块间未联通实现
 - 是否存在无测试保护的核心模块
@@ -190,14 +215,15 @@ def step10_project_check() -> str:
 """
 
 
-def step11_project_fix() -> str:
+def step11_project_fix(scope: Optional[str] = None) -> str:
     """Step 11: 项目级补充实现"""
     return f"""
 {WORKFLOW_CONTEXT}
+{_scope_constraint(scope)}
 
 ## 任务：项目级补充实现与测试
 
-对可继续实现的部分：
+对可继续实现的部分（若指定 scope，仅修改 scope 范围内的代码）：
 - 使用 Plan 补充代码与测试
 - 重复编译、运行、测试流程
 
