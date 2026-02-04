@@ -1,22 +1,26 @@
 #!/bin/bash
 # PyPI 发布脚本
 # 用法: ./scripts/publish-pypi.sh
-# 前置: pip install build twine
+# 自动使用 venv 避免 externally-managed-environment 错误
 
 set -e
 cd "$(dirname "$0")/.."
 
 echo "=== CodingPlan PyPI 发布 ==="
 
-# 检查工具
-for cmd in python3 pip; do
-    if ! command -v $cmd &>/dev/null; then
-        echo "错误: 需要 $cmd"
-        exit 1
-    fi
-done
+# 检查 Python
+if ! command -v python3 &>/dev/null; then
+    echo "错误: 需要 python3"
+    exit 1
+fi
 
-# 安装构建依赖
+# 使用项目 venv 或创建临时 venv
+VENV_DIR=".venv-publish"
+if [ ! -d "$VENV_DIR" ]; then
+    echo "创建发布用虚拟环境..."
+    python3 -m venv "$VENV_DIR"
+fi
+source "$VENV_DIR/bin/activate"
 pip install -q build twine
 
 # 清理

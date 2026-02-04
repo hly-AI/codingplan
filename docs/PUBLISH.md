@@ -17,25 +17,32 @@ git push origin main --tags
 ### 前置条件
 
 - 在 [PyPI](https://pypi.org) 注册账号
-- 安装构建工具：`pip install build twine`
+- 构建工具：脚本会自动创建 venv 并安装，无需手动安装
 
-### 发布步骤
-
-```bash
-# 清理旧构建
-rm -rf dist/ build/ *.egg-info
-
-# 构建
-python -m build
-
-# 上传（首次需输入 PyPI 用户名和密码/Token）
-twine upload dist/*
-```
-
-或使用脚本：
+### 发布步骤（推荐）
 
 ```bash
 ./scripts/publish-pypi.sh
+```
+
+脚本会自动创建 `.venv-publish` 虚拟环境并安装 build、twine，避免 `externally-managed-environment` 错误。
+
+### 手动发布
+
+若需手动执行，请使用 venv 或 pipx（避免直接 `pip install` 触发 PEP 668 限制）：
+
+```bash
+# 方式 A：使用 venv
+python3 -m venv .venv && source .venv/bin/activate
+pip install build twine
+python -m build
+twine upload dist/*
+
+# 方式 B：使用 pipx（需 brew install pipx）
+pipx install build
+pipx install twine
+python -m build
+twine upload dist/*
 ```
 
 发布成功后，用户可：

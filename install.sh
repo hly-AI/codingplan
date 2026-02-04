@@ -41,16 +41,20 @@ else
     cd "$INSTALL_DIR"
 fi
 
-# 安装
+# 安装（使用 venv 避免 externally-managed-environment）
 echo "安装 Python 包..."
-pip3 install -e . --user -q
+VENV="$INSTALL_DIR/.venv"
+if [ ! -d "$VENV" ]; then
+    python3 -m venv "$VENV"
+fi
+"$VENV/bin/pip" install -e . -q
 
 # 创建可执行脚本（确保 codingplan 命令可用）
 mkdir -p "$BIN_DIR"
 SCRIPT="$BIN_DIR/codingplan"
 cat > "$SCRIPT" << WRAPPER
 #!/bin/bash
-exec python3 -m codingplan.cli "\$@"
+exec "$INSTALL_DIR/.venv/bin/python" -m codingplan.cli "\$@"
 WRAPPER
 chmod +x "$SCRIPT"
 
