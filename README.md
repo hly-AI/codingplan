@@ -101,6 +101,8 @@ codingplan ./requirements -f feature-a.md
 
 # 实现范围限制 + 额外提醒（如：需求含 iOS+Android，请确保两平台都实现）
 codingplan ./requirements -s ugc_kmp -H "需求包含 iOS 和 Android 两个 App 端，请确保两个平台都实现"
+codingplan ./ugc_prd/pdf -s ugc_kmp -H "需求包含 iOS 和 Android 两个 App 端，请确保两个平台都实现"
+
 ```
 
 ### 实现范围限制（--scope / -s）
