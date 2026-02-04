@@ -39,9 +39,13 @@ def run_agent(
     Returns:
         subprocess.CompletedProcess
     """
+    # 移除 null 字节，否则 subprocess 在 Unix 上会报 ValueError: embedded null byte
+    # （PDF 等二进制文件 read_text 时可能产生 null）
+    prompt_safe = prompt.replace("\x00", "")
+
     cmd = [
         "agent",
-        "-p", prompt,
+        "-p", prompt_safe,
         "--mode", mode,
         "--output-format", output_format,
     ]

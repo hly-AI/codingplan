@@ -45,7 +45,6 @@ def process_single_file(
     dirs: dict,
     resume_from_step: Optional[int] = None,
     scope: Optional[str] = None,
-    hint: Optional[str] = None,
 ) -> bool:
     """
     处理单个需求文件的完整流程
@@ -65,7 +64,9 @@ def process_single_file(
     # Step 1: 文档规范化
     if start_step <= 1:
         content = req_file.read_text(encoding="utf-8", errors="replace")
-        prompt = prompts.step1_normalize(str(req_file), content, hint=hint)
+        # 移除 null 字节，避免 subprocess 报 "ValueError: embedded null byte"（PDF 等可能包含）
+        content = content.replace("\x00", "")
+        prompt = prompts.step1_normalize(str(req_file), content)
         result = run_agent(prompt, cwd=project_root)
         if result.returncode != 0:
             return False
@@ -78,7 +79,7 @@ def process_single_file(
     # Step 2: 需求补全
     if start_step <= 2:
         req_input = normalized_path if normalized_path.exists() else req_file
-        prompt = prompts.step2_complete(str(req_file), str(req_input), hint=hint)
+        prompt = prompts.step2_complete(str(req_file), str(req_input))
         result = run_agent(prompt, cwd=project_root)
         if result.returncode != 0:
             return False
@@ -86,7 +87,7 @@ def process_single_file(
     # Step 3: 概要设计
     if start_step <= 3:
         req_input = req_path if req_path.exists() else normalized_path
-        prompt = prompts.step3_outline(str(req_input), base_name, scope=scope, hint=hint)
+        prompt = prompts.step3_outline(str(req_input), base_name, scope=scope)
         result = run_agent(prompt, cwd=project_root)
         if result.returncode != 0:
             return False
@@ -94,7 +95,7 @@ def process_single_file(
     # Step 4: 详细设计
     if start_step <= 4:
         ol_input = outline_path if outline_path.exists() else dirs["outputs"] / f"{base_name}-outline-design.md"
-        prompt = prompts.step4_detail(str(ol_input), str(req_path), base_name, scope=scope, hint=hint)
+        prompt = prompts.step4_detail(str(ol_input), str(req_path), base_name, scope=scope)
         result = run_agent(prompt, cwd=project_root)
         if result.returncode != 0:
             return False
@@ -102,14 +103,14 @@ def process_single_file(
     # Step 5: 代码实现（Plan 模式）
     if start_step <= 5:
         detail_input = detail_path if detail_path.exists() else dirs["outputs"] / f"{base_name}-detail-design.md"
-        prompt = prompts.step5_implement(str(detail_input), str(req_path), scope=scope, hint=hint)
+        prompt = prompts.step5_implement(str(detail_input), str(req_path), scope=scope)
         result = run_plan(prompt, cwd=project_root)
         if result.returncode != 0:
             return False
 
     # Step 6: 测试设计
     if start_step <= 6:
-        prompt = prompts.step6_test_design(str(req_path), str(detail_path), base_name, scope=scope, hint=hint)
+        prompt = prompts.step6_test_design(str(req_path), str(detail_path), base_name, scope=scope)
         result = run_agent(prompt, cwd=project_root)
         if result.returncode != 0:
             return False
@@ -117,7 +118,7 @@ def process_single_file(
     # Step 7: 测试实现
     if start_step <= 7:
         td_input = test_design_path if test_design_path.exists() else dirs["outputs"] / f"{base_name}-test-design.md"
-        prompt = prompts.step7_test_impl(str(td_input), scope=scope, hint=hint)
+        prompt = prompts.step7_test_impl(str(td_input), scope=scope)
         result = run_plan(prompt, cwd=project_root)
         if result.returncode != 0:
             return False
@@ -126,7 +127,7 @@ def process_single_file(
     if start_step <= 8:
         max_retries = 5
         for attempt in range(max_retries):
-            prompt = prompts.step8_build_test(scope=scope, hint=hint)
+            prompt = prompts.step8_build_test(scope=scope)
             result = run_agent(prompt, cwd=project_root)
             if result.returncode == 0:
                 break
@@ -141,7 +142,7 @@ def process_single_file(
 
     # Step 9: 完成度校验
     if start_step <= 9:
-        prompt = prompts.step9_validate(str(req_path), scope=scope, hint=hint)
+        prompt = prompts.step9_validate(str(req_path), scope=scope)
         result = run_agent(prompt, cwd=project_root)
         if result.returncode != 0:
             return False
@@ -149,14 +150,14 @@ def process_single_file(
     return True
 
 
-def process_project_check(project_root: Path, dirs: dict, scope: Optional[str] = None, hint: Optional[str] = None) -> bool:
+def process_project_check(project_root: Path, dirs: dict, scope: Optional[str] = None) -> bool:
     """Step 10 & 11: 项目整体检查与补充"""
-    prompt = prompts.step10_project_check(scope=scope, hint=hint)
+    prompt = prompts.step10_project_check(scope=scope)
     result = run_agent(prompt, cwd=project_root)
     if result.returncode != 0:
         return False
 
-    prompt = prompts.step11_project_fix(scope=scope, hint=hint)
+    prompt = prompts.step11_project_fix(scope=scope)
     result = run_agent(prompt, cwd=project_root)
     return result.returncode == 0
 
@@ -167,7 +168,6 @@ def run_workflow(
     resume: bool = False,
     single_file: Optional[str] = None,
     scope: Optional[str] = None,
-    hint: Optional[str] = None,
 ) -> int:
     """
     运行完整工作流
@@ -184,16 +184,11 @@ def run_workflow(
     state = WorkflowState(state_file)
     if resume:
         state.load()
-        # 恢复时沿用上次的 scope、hint（若本次未指定）
+        # 恢复时沿用上次的 scope（若本次未指定）
         if scope is None and state.data.get("scope"):
             scope = state.data["scope"]
-        if hint is None and state.data.get("hint"):
-            hint = state.data["hint"]
     if scope:
         state.data["scope"] = scope
-    if hint:
-        state.data["hint"] = hint
-    if scope or hint:
         state.save()
 
     files = collect_requirement_files(req_dir)
@@ -209,12 +204,10 @@ def run_workflow(
 
     if scope:
         print(f"实现范围限制: 仅限 {scope}/ 目录")
-    if hint:
-        print(f"额外提醒: {hint}")
     print(f"共 {len(files)} 个需求文件待处理")
     for i, req_file in enumerate(files, 1):
         print(f"\n[{i}/{len(files)}] 处理: {req_file.name}")
-        success = process_single_file(req_file, project_root, dirs, scope=scope, hint=hint)
+        success = process_single_file(req_file, project_root, dirs, scope=scope)
         if not success:
             print(f"处理失败: {req_file.name}")
             state.data["current_file"] = str(req_file)
@@ -225,7 +218,7 @@ def run_workflow(
 
     # 全部需求完成后，执行项目级检查
     print("\n执行项目整体完成度与测试检查...")
-    if not process_project_check(project_root, dirs, scope=scope, hint=hint):
+    if not process_project_check(project_root, dirs, scope=scope):
         print("项目级检查或补充未完全成功")
         return 1
 
