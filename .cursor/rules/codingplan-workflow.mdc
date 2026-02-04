@@ -1,0 +1,14 @@
+---
+description: CodingPlan 自动化需求处理工作流规则
+globs: 
+alwaysApply: false
+---
+
+# CodingPlan 工作流
+
+当用户或 CodingPlan 工具触发需求处理时：
+
+1. 不确定内容一律写入 `uncertain/`
+2. 测试不可跳过，功能未测试不视为完成
+3. 产出文档按约定命名放入 `outputs/`
+4. 测试代码放入 `tests/` 并与被测模块关联命名
