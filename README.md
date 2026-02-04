@@ -19,11 +19,15 @@
 
 ```bash
 # 使用 pipx（推荐，独立环境，全局可用）
-pipx install git+https://gitee.com/your-org/codingplan.git
+pipx install git+https://gitee.com/project_hub_1/codingplan.git
+
+# 或从 PyPI（发布后）
+pip install codingplan
+# 或 pipx install codingplan
 
 # 或使用 pip + venv
 python3 -m venv .venv && source .venv/bin/activate
-pip install git+https://gitee.com/your-org/codingplan.git
+pip install git+https://gitee.com/project_hub_1/codingplan.git
 ```
 
 ### 方式二：本地开发安装
@@ -37,7 +41,7 @@ pip install -e .
 ### 方式三：curl 一键安装
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/your-org/codingplan/main/install.sh | bash
+curl -fsSL https://gitee.com/project_hub_1/codingplan/raw/main/install.sh | bash
 ```
 
 安装后若 `codingplan` 命令不可用，请将 `~/.local/bin` 加入 PATH：
@@ -46,16 +50,14 @@ curl -fsSL https://raw.githubusercontent.com/your-org/codingplan/main/install.sh
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
-### 方式四：Homebrew（需自建 Tap）
+### 方式四：Homebrew
 
-1. 创建 Homebrew Tap 仓库 `homebrew-codingplan`
-2. 将 `Formula/codingplan.rb` 放入 `Formula/` 目录
-3. 更新 formula 中的 `url` 和 `sha256`（发布 tag 后）
-4. 用户安装：
-   ```bash
-   brew tap your-org/codingplan
-   brew install codingplan
-   ```
+```bash
+brew tap project_hub_1/homebrew-codingplan https://gitee.com/project_hub_1/homebrew-codingplan
+brew install codingplan
+```
+
+需先创建 [homebrew-codingplan](https://gitee.com/project_hub_1/homebrew-codingplan) 仓库并放入 Formula，详见 [发布说明](docs/PUBLISH.md)。
 
 ## 使用
 

@@ -1,13 +1,12 @@
 #!/bin/bash
 # CodingPlan 安装脚本
-# 用法: curl -fsSL https://raw.githubusercontent.com/your-org/codingplan/main/install.sh | bash
-# 或: curl -fsSL https://gitee.com/your-org/codingplan/raw/main/install.sh | bash
+# 用法: curl -fsSL https://gitee.com/project_hub_1/codingplan/raw/main/install.sh | bash
 
 set -e
 
 INSTALL_DIR="${CODINGPLAN_INSTALL_DIR:-$HOME/.local/share/codingplan}"
 BIN_DIR="${CODINGPLAN_BIN_DIR:-$HOME/.local/bin}"
-REPO_URL="${CODINGPLAN_REPO_URL:-https://github.com/your-org/codingplan.git}"
+REPO_URL="${CODINGPLAN_REPO_URL:-https://gitee.com/project_hub_1/codingplan.git}"
 
 echo "CodingPlan 安装程序"
 echo "===================="
