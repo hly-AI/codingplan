@@ -99,8 +99,8 @@ codingplan ./requirements --resume
 # 仅处理单个文件
 codingplan ./requirements -f feature-a.md
 
-# 实现范围限制：仅在此目录内实现/修改代码（如 ugc_kmp），其他目录不修改
-codingplan ./requirements -s ugc_kmp
+# 实现范围限制 + 额外提醒（如：需求含 iOS+Android，请确保两平台都实现）
+codingplan ./requirements -s ugc_kmp -H "需求包含 iOS 和 Android 两个 App 端，请确保两个平台都实现"
 ```
 
 ### 实现范围限制（--scope / -s）
@@ -113,6 +113,18 @@ codingplan ./requirements -s ugc_kmp
 ```
 
 工具会在设计、实现、测试、编译等各阶段约束 Agent 仅修改指定目录内的代码。
+
+### 额外提醒（--hint / -H）
+
+当需求有特殊约束或易被忽略的要点时，可用 `-H` 注入额外提醒，会贯穿所有步骤的 prompt：
+
+```bash
+# 需求含 iOS 和 Android 两个 App 端，提醒 Agent 确保两平台都实现
+codingplan ./requirements -s ugc_kmp -H "需求包含 iOS 和 Android 两个 App 端，请确保两个平台都实现"
+
+# 可组合使用
+codingplan ./requirements -s ugc_kmp -H "需兼容暗色模式，设计时考虑主题切换"
+```
 
 ### 目录约定
 

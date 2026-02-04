@@ -21,6 +21,8 @@ def main():
   codingplan ./docs/reqs -r           # 从上次中断处继续
   codingplan ./reqs -f feature-a.md   # 仅处理指定文件
   codingplan ./reqs -s ugc_kmp        # 仅限在 ugc_kmp 目录内实现
+  codingplan ./reqs -H "需求含 iOS+Android，请确保两平台都实现"  # 额外提醒
+  codingplan ./reqs -s ugc_kmp -H "需求含 iOS+Android，两平台都要实现"
 
 前置条件:
   1. 已安装 Cursor CLI: curl https://cursor.com/install -fsS | bash
@@ -54,6 +56,13 @@ def main():
         help="实现范围限制：仅在此目录内实现/修改代码（如 ugc_kmp），其他目录不修改",
     )
     parser.add_argument(
+        "-H", "--hint",
+        dest="hint",
+        type=str,
+        metavar="TEXT",
+        help="额外上下文或提醒，会注入到各步骤 prompt 中（如：需求包含 iOS 和 Android，请确保两个平台都实现）",
+    )
+    parser.add_argument(
         "-v", "--version",
         action="version",
         version=f"%(prog)s {__version__}",
@@ -78,6 +87,7 @@ def main():
         resume=args.resume,
         single_file=args.single_file,
         scope=args.scope,
+        hint=args.hint,
     )
     sys.exit(exit_code)
 

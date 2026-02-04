@@ -16,6 +16,17 @@ def _scope_constraint(scope: Optional[str]) -> str:
 """
 
 
+def _hint_block(hint: Optional[str]) -> str:
+    """生成额外提醒/上下文块"""
+    if not hint or not hint.strip():
+        return ""
+    return f"""
+## 额外提醒（必须遵守）
+
+{hint.strip()}
+"""
+
+
 WORKFLOW_CONTEXT = """
 你正在执行「基于 Cursor CLI 的自动化需求处理闭环流程」。必须遵守以下规则：
 - 任意阶段出现不确定内容，必须写入 uncertain/ 目录
@@ -25,10 +36,11 @@ WORKFLOW_CONTEXT = """
 """
 
 
-def step1_normalize(file_path: str, content_preview: str) -> str:
+def step1_normalize(file_path: str, content_preview: str, hint: Optional[str] = None) -> str:
     """Step 1: 原始文档读取与规范化"""
     return f"""
 {WORKFLOW_CONTEXT}
+{_hint_block(hint)}
 
 ## 任务：文档规范化
 
@@ -43,10 +55,11 @@ def step1_normalize(file_path: str, content_preview: str) -> str:
 """
 
 
-def step2_complete(file_path: str, req_doc_path: str) -> str:
+def step2_complete(file_path: str, req_doc_path: str, hint: Optional[str] = None) -> str:
     """Step 2: 需求文档补全与完善"""
     return f"""
 {WORKFLOW_CONTEXT}
+{_hint_block(hint)}
 
 ## 任务：需求补全
 
@@ -62,11 +75,12 @@ def step2_complete(file_path: str, req_doc_path: str) -> str:
 """
 
 
-def step3_outline(req_doc_path: str, base_name: str, scope: Optional[str] = None) -> str:
+def step3_outline(req_doc_path: str, base_name: str, scope: Optional[str] = None, hint: Optional[str] = None) -> str:
     """Step 3: 概要设计"""
     return f"""
 {WORKFLOW_CONTEXT}
 {_scope_constraint(scope)}
+{_hint_block(hint)}
 
 ## 任务：概要设计
 
@@ -82,11 +96,12 @@ def step3_outline(req_doc_path: str, base_name: str, scope: Optional[str] = None
 """
 
 
-def step4_detail(outline_path: str, req_path: str, base_name: str, scope: Optional[str] = None) -> str:
+def step4_detail(outline_path: str, req_path: str, base_name: str, scope: Optional[str] = None, hint: Optional[str] = None) -> str:
     """Step 4: 详细设计"""
     return f"""
 {WORKFLOW_CONTEXT}
 {_scope_constraint(scope)}
+{_hint_block(hint)}
 
 ## 任务：详细设计
 
@@ -100,11 +115,12 @@ def step4_detail(outline_path: str, req_path: str, base_name: str, scope: Option
 """
 
 
-def step5_implement(detail_path: str, req_path: str, scope: Optional[str] = None) -> str:
+def step5_implement(detail_path: str, req_path: str, scope: Optional[str] = None, hint: Optional[str] = None) -> str:
     """Step 5: 基于 Plan 的代码实现"""
     return f"""
 {WORKFLOW_CONTEXT}
 {_scope_constraint(scope)}
+{_hint_block(hint)}
 
 ## 任务：代码实现（使用 Plan 模式）
 
@@ -117,11 +133,12 @@ def step5_implement(detail_path: str, req_path: str, scope: Optional[str] = None
 """
 
 
-def step6_test_design(req_path: str, detail_path: str, base_name: str, scope: Optional[str] = None) -> str:
+def step6_test_design(req_path: str, detail_path: str, base_name: str, scope: Optional[str] = None, hint: Optional[str] = None) -> str:
     """Step 6: 测试设计"""
     return f"""
 {WORKFLOW_CONTEXT}
 {_scope_constraint(scope)}
+{_hint_block(hint)}
 
 ## 任务：测试设计
 
@@ -139,11 +156,12 @@ def step6_test_design(req_path: str, detail_path: str, base_name: str, scope: Op
 """
 
 
-def step7_test_impl(test_design_path: str, scope: Optional[str] = None) -> str:
+def step7_test_impl(test_design_path: str, scope: Optional[str] = None, hint: Optional[str] = None) -> str:
     """Step 7: 测试代码实现"""
     return f"""
 {WORKFLOW_CONTEXT}
 {_scope_constraint(scope)}
+{_hint_block(hint)}
 
 ## 任务：测试代码实现
 
@@ -155,11 +173,12 @@ def step7_test_impl(test_design_path: str, scope: Optional[str] = None) -> str:
 """
 
 
-def step8_build_test(scope: Optional[str] = None) -> str:
+def step8_build_test(scope: Optional[str] = None, hint: Optional[str] = None) -> str:
     """Step 8: 编译、运行、测试"""
     return f"""
 {WORKFLOW_CONTEXT}
 {_scope_constraint(scope)}
+{_hint_block(hint)}
 
 ## 任务：编译、运行、测试
 
@@ -177,11 +196,12 @@ def step8_build_test(scope: Optional[str] = None) -> str:
 """
 
 
-def step9_validate(req_path: str, scope: Optional[str] = None) -> str:
+def step9_validate(req_path: str, scope: Optional[str] = None, hint: Optional[str] = None) -> str:
     """Step 9: 单需求完成度校验"""
     return f"""
 {WORKFLOW_CONTEXT}
 {_scope_constraint(scope)}
+{_hint_block(hint)}
 
 ## 任务：完成度校验
 
@@ -198,11 +218,12 @@ def step9_validate(req_path: str, scope: Optional[str] = None) -> str:
 """
 
 
-def step10_project_check(scope: Optional[str] = None) -> str:
+def step10_project_check(scope: Optional[str] = None, hint: Optional[str] = None) -> str:
     """Step 10: 项目整体检查"""
     return f"""
 {WORKFLOW_CONTEXT}
 {_scope_constraint(scope)}
+{_hint_block(hint)}
 
 ## 任务：项目整体完成度与全量测试检查
 
@@ -215,11 +236,12 @@ def step10_project_check(scope: Optional[str] = None) -> str:
 """
 
 
-def step11_project_fix(scope: Optional[str] = None) -> str:
+def step11_project_fix(scope: Optional[str] = None, hint: Optional[str] = None) -> str:
     """Step 11: 项目级补充实现"""
     return f"""
 {WORKFLOW_CONTEXT}
 {_scope_constraint(scope)}
+{_hint_block(hint)}
 
 ## 任务：项目级补充实现与测试
 
