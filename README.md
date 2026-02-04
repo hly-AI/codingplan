@@ -75,6 +75,18 @@ brew install codingplan
 - **Homebrew**：创建 `homebrew-codingplan` 仓库，运行 `./scripts/prepare-homebrew-tap.sh` 生成 Formula 并推送
 - **Gitee**：发布 tag 后，在 Formula 中更新 `url` 和 `sha256`，以支持 `brew install codingplan`（非 `--HEAD`）
 
+### 更新
+
+根据你的安装方式选择对应命令：
+
+| 安装方式 | 更新命令 |
+|----------|----------|
+| **pipx** | `pipx upgrade codingplan` 或 `pipx install --force git+https://gitee.com/project_hub_1/codingplan.git` |
+| **pip (venv)** | `pip install --upgrade codingplan` 或 `pip install --upgrade git+https://gitee.com/project_hub_1/codingplan.git` |
+| **curl 一键** | 再次执行 `curl -fsSL https://gitee.com/project_hub_1/codingplan/raw/main/install.sh \| bash`（会拉取最新并重装） |
+| **本地开发** | `cd codingplan && git pull && pip install -e .` |
+| **Homebrew** | `brew upgrade codingplan` 或 `brew upgrade codingplan --fetch-HEAD`（若用 `--HEAD` 安装） |
+
 ## 使用
 
 ```bash

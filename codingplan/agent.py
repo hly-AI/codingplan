@@ -22,7 +22,7 @@ def check_agent_installed() -> bool:
 def run_agent(
     prompt: str,
     cwd: Optional[Path] = None,
-    mode: str = "agent",
+    mode: str = "plan",
     force: bool = True,
     output_format: str = "text",
 ) -> subprocess.CompletedProcess:
@@ -32,7 +32,7 @@ def run_agent(
     Args:
         prompt: 任务描述
         cwd: 工作目录（项目根目录）
-        mode: agent | plan | ask
+        mode: plan | ask（Cursor CLI 仅支持此两种模式，plan 可修改文件，ask 只读）
         force: 是否允许直接修改文件（非交互模式必需）
         output_format: text | json | stream-json
 
@@ -67,5 +67,5 @@ def run_ask(prompt: str, cwd: Optional[Path] = None) -> subprocess.CompletedProc
 
 
 def run_implement(prompt: str, cwd: Optional[Path] = None) -> subprocess.CompletedProcess:
-    """使用 Agent 模式执行（可修改文件）"""
-    return run_agent(prompt, cwd=cwd, mode="agent")
+    """使用 Plan 模式执行（可修改文件）"""
+    return run_agent(prompt, cwd=cwd, mode="plan")
