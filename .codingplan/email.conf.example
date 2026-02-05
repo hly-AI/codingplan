@@ -1,0 +1,17 @@
+# CodingPlan 邮件通知配置文件
+# 复制为 email.conf 并填写实际值
+# 项目级：.codingplan/email.conf（项目根目录）
+# 用户级：~/.config/codingplan/email.conf 或 ~/.codingplan/email.conf
+
+[smtp]
+# 发件邮箱 SMTP 配置
+host = smtp.qq.com
+port = 587
+user = your@qq.com
+password = 你的授权码
+# from = your@qq.com
+# use_tls = 1
+
+[notify]
+# 默认收件人，多个用逗号分隔（可选，也可用 -e 参数指定）
+emails = notify@example.com

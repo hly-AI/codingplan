@@ -7,6 +7,7 @@ from pathlib import Path
 DIR_UNCERTAIN = "uncertain"
 DIR_OUTPUTS = "outputs"
 DIR_TESTS = "tests"
+DIR_UI_DESIGN = "uidesign"  # 默认 UI 设计目录（Figma 链接与交互说明）
 
 # 支持的需求文件扩展名
 REQUIREMENT_EXTENSIONS = {".md", ".txt", ".docx", ".pdf"}
