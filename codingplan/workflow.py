@@ -1,6 +1,7 @@
 """工作流编排器"""
 
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
@@ -151,6 +152,21 @@ def process_single_file(
     return True
 
 
+def _print_duration(start_time: datetime) -> None:
+    """打印耗时统计"""
+    end_time = datetime.now()
+    delta = end_time - start_time
+    hours, remainder = divmod(int(delta.total_seconds()), 3600)
+    minutes, seconds = divmod(remainder, 60)
+    if hours > 0:
+        duration_str = f"{hours}小时{minutes}分{seconds}秒"
+    elif minutes > 0:
+        duration_str = f"{minutes}分{seconds}秒"
+    else:
+        duration_str = f"{seconds}秒"
+    print(f"\n结束时间: {end_time.strftime('%Y-%m-%d %H:%M:%S')} | 总耗时: {duration_str}")
+
+
 def process_project_check(project_root: Path, dirs: dict, scope: Optional[str] = None, hint: Optional[str] = None) -> bool:
     """Step 10 & 11: 项目整体检查与补充"""
     prompt = prompts.step10_project_check(scope=scope, hint=hint)
@@ -180,6 +196,9 @@ def run_workflow(
     if not check_agent_installed():
         print("错误: 未检测到 Cursor Agent。请先安装: curl https://cursor.com/install -fsS | bash")
         return 1
+
+    start_time = datetime.now()
+    print(f"开始时间: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
 
     dirs = get_output_dirs(project_root)
     state_file = project_root / ".codingplan" / "state.json"
@@ -218,6 +237,7 @@ def run_workflow(
         print(f"\n[{i}/{len(files)}] 处理: {req_file.name}")
         success = process_single_file(req_file, project_root, dirs, scope=scope, hint=hint)
         if not success:
+            _print_duration(start_time)
             print(f"处理失败: {req_file.name}")
             state.data["current_file"] = str(req_file)
             state.save()
@@ -228,8 +248,10 @@ def run_workflow(
     # 全部需求完成后，执行项目级检查
     print("\n执行项目整体完成度与测试检查...")
     if not process_project_check(project_root, dirs, scope=scope, hint=hint):
+        _print_duration(start_time)
         print("项目级检查或补充未完全成功")
         return 1
 
+    _print_duration(start_time)
     print("\n所有需求处理完成。")
     return 0
