@@ -6,6 +6,7 @@ from pathlib import Path
 from .workflow import run_workflow
 from . import notify
 from . import __version__
+from . import init_cmd
 
 
 def main():
@@ -18,6 +19,7 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 示例:
+  codingplan init                     # 创建 .codingplan/email.conf 模板
   codingplan ./requirements          # 处理 requirements 目录下所有需求
   codingplan ./docs/reqs -r           # 从上次中断处继续
   codingplan ./reqs -f feature-a.md   # 仅处理指定文件
@@ -37,7 +39,9 @@ def main():
     parser.add_argument(
         "req_dir",
         type=str,
-        help="需求文件所在目录（相对于当前工作目录）",
+        nargs="?",
+        default=None,
+        help="需求文件所在目录。使用 'init' 可创建 .codingplan/email.conf 模板",
     )
     parser.add_argument(
         "-r", "--resume",
@@ -93,6 +97,13 @@ def main():
     )
 
     args = parser.parse_args()
+
+    # codingplan init：创建 .codingplan/email.conf 模板
+    if args.req_dir == "init":
+        sys.exit(init_cmd.run_init(Path.cwd()))
+
+    if not args.req_dir:
+        parser.error("请指定需求目录，或使用 'codingplan init' 创建邮件配置模板")
 
     project_root = Path.cwd()
     req_dir = project_root / args.req_dir

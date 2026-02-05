@@ -95,6 +95,28 @@ brew install codingplan
 
 ## 使用
 
+### 初始化项目（codingplan init）
+
+在项目根目录执行，一次性创建 CodingPlan 相关配置：
+
+```bash
+cd /path/to/your/project
+codingplan init
+```
+
+会创建/更新：
+
+| 文件 | 说明 |
+|------|------|
+| `.codingplan/email.conf` | 邮件配置模板，需填写发件邮箱、授权码、收件人 |
+| `AGENTS.md` | 工作流规则，供 Agent 遵守 |
+| `.cursor/rules/codingplan-workflow.mdc` | Cursor 规则 |
+| `.gitignore` | 追加 `.codingplan/email.conf`、`state.json` 忽略项 |
+
+已存在的文件不会覆盖。
+
+### 处理需求
+
 ```bash
 # 处理指定目录下所有需求文件
 codingplan ./requirements
@@ -124,11 +146,12 @@ codingplan ./requirements -e user@example.com
 
 #### 快速配置（推荐）
 
-1. 复制示例配置并编辑：
+1. 在项目根目录执行 `codingplan init` 自动创建配置，再编辑 email.conf：
    ```bash
-   mkdir -p .codingplan
-   cp .codingplan/email.conf.example .codingplan/email.conf
-   # 编辑 .codingplan/email.conf，填写发件邮箱和收件人
+   cd /path/to/your/project
+   codingplan init
+   # 会创建：.codingplan/email.conf、AGENTS.md、.cursor/rules/、.gitignore 条目
+   # 编辑 .codingplan/email.conf，将占位符替换为实际值
    ```
 
 2. 配置文件格式：

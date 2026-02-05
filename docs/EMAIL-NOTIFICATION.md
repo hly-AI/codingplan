@@ -33,18 +33,21 @@ CodingPlan 在任务**完成**（无论成功或失败）后，可向指定邮�
 
 ### 3.2 配置文件格式
 
-复制示例文件并编辑：
+**方式一：使用 `codingplan init` 自动创建（推荐）**
 
 ```bash
-# 项目级：在项目根目录
+cd /path/to/your/project
+codingplan init
+# 会创建：.codingplan/email.conf、AGENTS.md、.cursor/rules/codingplan-workflow.mdc，并更新 .gitignore
+# 编辑 .codingplan/email.conf，将占位符替换为实际值
+```
+
+**方式二：手动复制**
+
+```bash
 mkdir -p .codingplan
-# 从仓库示例复制（若使用本项目开发安装）
 cp .codingplan/email.conf.example .codingplan/email.conf
 # 编辑 .codingplan/email.conf，填写真实值
-
-# 或用户级（对本机所有项目生效）
-mkdir -p ~/.config/codingplan
-# 创建 ~/.config/codingplan/email.conf，内容同上
 ```
 
 `email.conf` 内容示例：

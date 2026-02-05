@@ -200,21 +200,35 @@ def process_project_check(project_root: Path, dirs: dict, scope: Optional[str] =
     return result.returncode == 0
 
 
-def _has_unfinished_state(state_file: Path, req_dir: Path) -> bool:
-    """检测是否存在未完成的状态（同需求目录）"""
+def _has_unfinished_state(state_file: Path, req_dir: Path) -> tuple[bool, str]:
+    """
+    检测是否存在未完成的状态（同需求目录）
+    Returns: (是否续传, 原因说明)
+    """
     if not state_file.exists():
-        return False
+        return False, "无状态文件"
     try:
         with open(state_file, "r", encoding="utf-8") as f:
             data = json.load(f)
     except (json.JSONDecodeError, OSError):
-        return False
+        return False, "状态文件损坏"
     if data.get("completed"):
-        return False
+        return False, "上次已全部完成"
     saved_req_dir = data.get("req_dir")
-    if saved_req_dir != str(req_dir):
-        return False
-    return bool(data.get("current_file") or data.get("files_done"))
+    if not saved_req_dir:
+        return False, "状态中无 req_dir"
+    # 使用 resolved 路径比较，避免 ./docs 与 docs、相对与绝对路径差异
+    try:
+        saved_resolved = str(Path(saved_req_dir).resolve())
+        current_resolved = str(req_dir.resolve())
+        if saved_resolved != current_resolved:
+            return False, f"需求目录不一致（上次: {saved_req_dir}，本次: {req_dir}）"
+    except (OSError, RuntimeError):
+        if saved_req_dir != str(req_dir):
+            return False, f"需求目录不一致（上次: {saved_req_dir}，本次: {req_dir}）"
+    if not (data.get("current_file") or data.get("files_done")):
+        return False, "无未完成记录"
+    return True, ""
 
 
 def run_workflow(
@@ -246,9 +260,13 @@ def run_workflow(
     state = WorkflowState(state_file)
 
     # 自动续传：未传 --fresh 且存在未完成状态时，自动从中断处继续
-    if not fresh and _has_unfinished_state(state_file, req_dir):
-        resume = True
-        print("检测到上次未完成，自动从中断处继续（使用 --fresh 可强制重新开始）")
+    if not fresh:
+        can_resume, reason = _has_unfinished_state(state_file, req_dir)
+        if can_resume:
+            resume = True
+            print("检测到上次未完成，自动从中断处继续（使用 --fresh 可强制重新开始）")
+        elif reason and state_file.exists():
+            print(f"提示: 未续传（{reason}）")
 
     if resume:
         state.load()
@@ -261,7 +279,7 @@ def run_workflow(
         state.data["scope"] = scope
     if hint:
         state.data["hint"] = hint
-    state.data["req_dir"] = str(req_dir)
+    state.data["req_dir"] = str(req_dir.resolve())
     state.save()
 
     files = collect_requirement_files(req_dir)
