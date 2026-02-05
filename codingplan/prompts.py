@@ -33,6 +33,7 @@ WORKFLOW_CONTEXT = """
 - 测试是强制阶段，不得跳过
 - 功能未测试不视为完成
 - 测试失败必须分析原因、修复、重试
+- **Git 推送**：若执行 git push 时出现 Connection stalled、timeout 等网络错误，可忽略，本地提交已足够，不影响工作流完成判定
 """
 
 
