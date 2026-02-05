@@ -16,7 +16,8 @@ if [ ! -d ".venv" ]; then
 fi
 
 echo "安装 editable 包..."
-.venv/bin/pip install -e . -q
+# 使用 python -m pip 避免 venv 迁移后 pip shebang 失效
+.venv/bin/python -m pip install -e . -q
 
 echo ""
 echo "安装完成! 使用方式:"
