@@ -19,7 +19,7 @@
 
 ```bash
 # 使用 pipx（推荐，独立环境，全局可用）
-pipx install git+https://gitee.com/project_hub_1/codingplan.git
+pipx install git+https://github.com/hly-AI/codingplan.git
 
 # 或从 PyPI（发布后）
 pip install codingplan
@@ -27,7 +27,7 @@ pip install codingplan
 
 # 或使用 pip + venv
 python3 -m venv .venv && source .venv/bin/activate
-pip install git+https://gitee.com/project_hub_1/codingplan.git
+pip install git+https://github.com/hly-AI/codingplan.git
 ```
 
 ### 方式二：本地开发安装
@@ -42,7 +42,7 @@ pip install -e .
 ### 方式三：curl 一键安装
 
 ```bash
-curl -fsSL https://gitee.com/project_hub_1/codingplan/raw/main/install.sh | bash
+curl -fsSL https://github.com/hly-AI/codingplan/raw/main/install.sh | bash
 ```
 
 安装后若 `codingplan` 命令不可用，请将 `~/.local/bin` 加入 PATH：
@@ -54,12 +54,12 @@ export PATH="$HOME/.local/bin:$PATH"
 ### 方式四：Homebrew
 
 ```bash
-brew tap project_hub_1/homebrew-codingplan https://gitee.com/project_hub_1/homebrew-codingplan
+brew tap hly-AI/homebrew-codingplan https://github.com/hly-AI/homebrew-codingplan
 brew install codingplan
 # 若尚未发布 tag，可使用: brew install codingplan --HEAD
 ```
 
-需先创建 [homebrew-codingplan](https://gitee.com/project_hub_1/homebrew-codingplan) 仓库并放入 Formula，详见 [发布说明](docs/PUBLISH.md)。
+需先创建 [homebrew-codingplan](https://github.com/hly-AI/homebrew-codingplan) 仓库并放入 Formula，详见 [发布说明](docs/PUBLISH.md)。
 
 ### 安装方式说明
 
@@ -81,9 +81,9 @@ brew install codingplan
 
 | 安装方式 | 更新命令 |
 |----------|----------|
-| **pipx** | `pipx upgrade codingplan` 或 `pipx install --force git+https://gitee.com/project_hub_1/codingplan.git` |
-| **pip (venv)** | `pip install --upgrade codingplan` 或 `pip install --upgrade git+https://gitee.com/project_hub_1/codingplan.git` |
-| **curl 一键** | 再次执行 `curl -fsSL https://gitee.com/project_hub_1/codingplan/raw/main/install.sh \| bash`（会拉取最新并重装） |
+| **pipx** | `pipx upgrade codingplan` 或 `pipx install --force git+https://github.com/hly-AI/codingplan.git` |
+| **pip (venv)** | `pip install --upgrade codingplan` 或 `pip install --upgrade git+https://github.com/hly-AI/codingplan.git` |
+| **curl 一键** | 再次执行 `curl -fsSL https://github.com/hly-AI/codingplan/raw/main/install.sh \| bash`（会拉取最新并重装） |
 | **本地开发** | `cd codingplan && git pull && pip install -e .` |
 | **Homebrew** | `brew upgrade codingplan` 或 `brew upgrade codingplan --fetch-HEAD`（若用 `--HEAD` 安装） |
 
