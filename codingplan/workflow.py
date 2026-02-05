@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Optional
 
 from .agent import run_agent, run_plan, run_ask, check_agent_installed
+from . import figma as figma_mod
 from . import notify
 from .config import get_output_dirs, REQUIREMENT_EXTENSIONS, STEPS
 from . import prompts
@@ -48,6 +49,7 @@ def process_single_file(
     resume_from_step: Optional[int] = None,
     scope: Optional[str] = None,
     hint: Optional[str] = None,
+    ui_dir: Optional[Path] = None,
 ) -> bool:
     """
     处理单个需求文件的完整流程
@@ -63,6 +65,10 @@ def process_single_file(
     test_design_path = dirs["outputs"] / f"{base_name}-test-design.md"
 
     start_step = resume_from_step or 1
+
+    # 提取 Figma 设计信息（需求文件、同目录 .figma.md、UI 设计目录）
+    req_dir = req_file.parent
+    figma_info = figma_mod.extract_from_req_dir(req_dir, req_file, ui_dir=ui_dir)
 
     # Step 1: 文档规范化
     if start_step <= 1:
@@ -86,11 +92,19 @@ def process_single_file(
         result = run_agent(prompt, cwd=project_root)
         if result.returncode != 0:
             return False
+        # 补全后可能新增 Figma 信息，重新提取
+        if req_path.exists():
+            merged = figma_mod.extract_from_file(req_path)
+            for link in merged.links:
+                if link not in figma_info.links:
+                    figma_info.links.append(link)
+            if merged.interaction_desc:
+                figma_info.interaction_desc = (figma_info.interaction_desc + "\n\n" + merged.interaction_desc).strip()
 
     # Step 3: 概要设计
     if start_step <= 3:
         req_input = req_path if req_path.exists() else normalized_path
-        prompt = prompts.step3_outline(str(req_input), base_name, scope=scope, hint=hint)
+        prompt = prompts.step3_outline(str(req_input), base_name, scope=scope, hint=hint, figma=figma_info)
         result = run_agent(prompt, cwd=project_root)
         if result.returncode != 0:
             return False
@@ -98,7 +112,7 @@ def process_single_file(
     # Step 4: 详细设计
     if start_step <= 4:
         ol_input = outline_path if outline_path.exists() else dirs["outputs"] / f"{base_name}-outline-design.md"
-        prompt = prompts.step4_detail(str(ol_input), str(req_path), base_name, scope=scope, hint=hint)
+        prompt = prompts.step4_detail(str(ol_input), str(req_path), base_name, scope=scope, hint=hint, figma=figma_info)
         result = run_agent(prompt, cwd=project_root)
         if result.returncode != 0:
             return False
@@ -106,14 +120,14 @@ def process_single_file(
     # Step 5: 代码实现（Plan 模式）
     if start_step <= 5:
         detail_input = detail_path if detail_path.exists() else dirs["outputs"] / f"{base_name}-detail-design.md"
-        prompt = prompts.step5_implement(str(detail_input), str(req_path), scope=scope, hint=hint)
+        prompt = prompts.step5_implement(str(detail_input), str(req_path), scope=scope, hint=hint, figma=figma_info)
         result = run_plan(prompt, cwd=project_root)
         if result.returncode != 0:
             return False
 
     # Step 6: 测试设计
     if start_step <= 6:
-        prompt = prompts.step6_test_design(str(req_path), str(detail_path), base_name, scope=scope, hint=hint)
+        prompt = prompts.step6_test_design(str(req_path), str(detail_path), base_name, scope=scope, hint=hint, figma=figma_info)
         result = run_agent(prompt, cwd=project_root)
         if result.returncode != 0:
             return False
@@ -121,7 +135,7 @@ def process_single_file(
     # Step 7: 测试实现
     if start_step <= 7:
         td_input = test_design_path if test_design_path.exists() else dirs["outputs"] / f"{base_name}-test-design.md"
-        prompt = prompts.step7_test_impl(str(td_input), scope=scope, hint=hint)
+        prompt = prompts.step7_test_impl(str(td_input), scope=scope, hint=hint, figma=figma_info)
         result = run_plan(prompt, cwd=project_root)
         if result.returncode != 0:
             return False
@@ -189,6 +203,7 @@ def process_project_check(project_root: Path, dirs: dict, scope: Optional[str] =
 def run_workflow(
     project_root: Path,
     req_dir: Path,
+    ui_dir: Optional[Path] = None,
     resume: bool = False,
     single_file: Optional[str] = None,
     scope: Optional[str] = None,
@@ -241,6 +256,8 @@ def run_workflow(
 
     if scope:
         print(f"实现范围限制: 仅限 {scope}/ 目录")
+    if ui_dir and ui_dir.exists():
+        print(f"UI 设计目录: {ui_dir}")
     if hint:
         print(f"额外提醒: {hint}")
     if notify_emails:
@@ -248,7 +265,7 @@ def run_workflow(
     print(f"共 {len(files)} 个需求文件待处理")
     for i, req_file in enumerate(files, 1):
         print(f"\n[{i}/{len(files)}] 处理: {req_file.name}")
-        success = process_single_file(req_file, project_root, dirs, scope=scope, hint=hint)
+        success = process_single_file(req_file, project_root, dirs, scope=scope, hint=hint, ui_dir=ui_dir)
         if not success:
             duration_str = _print_duration(start_time)
             print(f"处理失败: {req_file.name}")

@@ -2,6 +2,8 @@
 
 from typing import Optional
 
+from .figma import FigmaInfo
+
 
 def _scope_constraint(scope: Optional[str]) -> str:
     """生成 scope 限制说明"""
@@ -24,6 +26,30 @@ def _hint_block(hint: Optional[str]) -> str:
 ## 额外提醒（必须遵守）
 
 {hint.strip()}
+"""
+
+
+def _figma_block(figma: Optional[FigmaInfo]) -> str:
+    """生成 Figma 设计块"""
+    if not figma or figma.is_empty():
+        return ""
+    parts = []
+    if figma.links:
+        parts.append("**Figma 设计链接（必须参照实现 UI）：**")
+        for url in figma.links:
+            parts.append(f"- {url}")
+        parts.append("")
+    if figma.interaction_desc:
+        parts.append("**交互说明（必须实现）：**")
+        parts.append(figma.interaction_desc.strip())
+    if not parts:
+        return ""
+    return f"""
+## Figma 设计（必须遵守）
+
+请使用 Figma MCP 或直接访问上述链接获取设计稿，严格按设计实现 UI，并实现下述交互。
+
+{chr(10).join(parts)}
 """
 
 
@@ -75,11 +101,12 @@ def step2_complete(file_path: str, req_doc_path: str, hint: Optional[str] = None
 """
 
 
-def step3_outline(req_doc_path: str, base_name: str, scope: Optional[str] = None, hint: Optional[str] = None) -> str:
+def step3_outline(req_doc_path: str, base_name: str, scope: Optional[str] = None, hint: Optional[str] = None, figma: Optional[FigmaInfo] = None) -> str:
     """Step 3: 概要设计"""
     return f"""
 {WORKFLOW_CONTEXT}
 {_scope_constraint(scope)}
+{_figma_block(figma)}
 {_hint_block(hint)}
 
 ## 任务：概要设计
@@ -89,6 +116,7 @@ def step3_outline(req_doc_path: str, base_name: str, scope: Optional[str] = None
 - 模块划分
 - 核心流程说明
 - 技术选型（如适用）
+- 若有 Figma 设计，需包含 UI 架构与组件规划
 
 不确定点追加到 uncertain/ 目录。
 
@@ -96,11 +124,12 @@ def step3_outline(req_doc_path: str, base_name: str, scope: Optional[str] = None
 """
 
 
-def step4_detail(outline_path: str, req_path: str, base_name: str, scope: Optional[str] = None, hint: Optional[str] = None) -> str:
+def step4_detail(outline_path: str, req_path: str, base_name: str, scope: Optional[str] = None, hint: Optional[str] = None, figma: Optional[FigmaInfo] = None) -> str:
     """Step 4: 详细设计"""
     return f"""
 {WORKFLOW_CONTEXT}
 {_scope_constraint(scope)}
+{_figma_block(figma)}
 {_hint_block(hint)}
 
 ## 任务：详细设计
@@ -110,16 +139,18 @@ def step4_detail(outline_path: str, req_path: str, base_name: str, scope: Option
 - 数据结构
 - 接口定义
 - 核心逻辑说明
+- 若有 Figma 设计，需包含 UI 组件结构、布局、样式规范
 
 输出到 outputs/{base_name}-detail-design.md
 """
 
 
-def step5_implement(detail_path: str, req_path: str, scope: Optional[str] = None, hint: Optional[str] = None) -> str:
+def step5_implement(detail_path: str, req_path: str, scope: Optional[str] = None, hint: Optional[str] = None, figma: Optional[FigmaInfo] = None) -> str:
     """Step 5: 基于 Plan 的代码实现"""
     return f"""
 {WORKFLOW_CONTEXT}
 {_scope_constraint(scope)}
+{_figma_block(figma)}
 {_hint_block(hint)}
 
 ## 任务：代码实现（使用 Plan 模式）
@@ -128,16 +159,18 @@ def step5_implement(detail_path: str, req_path: str, scope: Optional[str] = None
 1. 拆解实现步骤
 2. 按计划逐步生成和修改代码
 3. 完成代码实现
+4. 若有 Figma 设计链接，请使用 Figma MCP 或访问链接获取设计稿，严格还原 UI 并实现交互
 
 请使用 Plan 方式：先设计实现步骤，再逐步编码。
 """
 
 
-def step6_test_design(req_path: str, detail_path: str, base_name: str, scope: Optional[str] = None, hint: Optional[str] = None) -> str:
+def step6_test_design(req_path: str, detail_path: str, base_name: str, scope: Optional[str] = None, hint: Optional[str] = None, figma: Optional[FigmaInfo] = None) -> str:
     """Step 6: 测试设计"""
     return f"""
 {WORKFLOW_CONTEXT}
 {_scope_constraint(scope)}
+{_figma_block(figma)}
 {_hint_block(hint)}
 
 ## 任务：测试设计
@@ -156,11 +189,12 @@ def step6_test_design(req_path: str, detail_path: str, base_name: str, scope: Op
 """
 
 
-def step7_test_impl(test_design_path: str, scope: Optional[str] = None, hint: Optional[str] = None) -> str:
+def step7_test_impl(test_design_path: str, scope: Optional[str] = None, hint: Optional[str] = None, figma: Optional[FigmaInfo] = None) -> str:
     """Step 7: 测试代码实现"""
     return f"""
 {WORKFLOW_CONTEXT}
 {_scope_constraint(scope)}
+{_figma_block(figma)}
 {_hint_block(hint)}
 
 ## 任务：测试代码实现

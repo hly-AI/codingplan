@@ -179,6 +179,23 @@ codingplan ./requirements -s ugc_kmp
 
 工具会在设计、实现、测试、编译等各阶段约束 Agent 仅修改指定目录内的代码。
 
+### Figma 设计（-u / --ui-dir）
+
+需求涉及 APP、Web、H5 等 UI 时，将 **Figma 链接** 和 **交互说明** 放在 **UI 设计目录**（默认 `uidesign/`）下，文件名与需求对应（如 `feature-a.md`）：
+
+```bash
+codingplan ./requirements -u uidesign   # 默认 uidesign
+codingplan ./requirements -u designs   # 指定 designs 目录
+```
+
+目录结构：
+```
+uidesign/
+└── feature-a.md    # 内容含 Figma 链接与交互说明
+```
+
+也可在需求文件或同目录 `xxx.figma.md` 中填写。详见 [Figma 设计集成说明](docs/FIGMA-DESIGN.md)。
+
 ### 额外提醒（--hint / -H）
 
 当需求有特殊约束或易被忽略的要点时，可用 `-H` 注入额外提醒，会贯穿所有步骤的 prompt：
@@ -201,6 +218,7 @@ codingplan ./requirements -s ugc_kmp -H "需兼容暗色模式，设计时考虑
 | `outputs/` | 需求、设计、测试设计等产出文档 |
 | `tests/` | 自动生成的测试代码 |
 | `.codingplan/` | 工作流状态（用于 --resume） |
+| `uidesign/` | 默认 UI 设计目录（Figma 链接与交互说明），可用 `-u` 指定其他目录 |
 
 ### 支持的需求文件格式
 
