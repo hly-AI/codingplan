@@ -1,6 +1,6 @@
 #!/bin/bash
 # CodingPlan 安装脚本
-# 用法: curl -fsSL https://gitee.com/project_hub_1/codingplan/raw/main/install.sh | bash
+# 用法: curl -fsSL https://raw.githubusercontent.com/hly-AI/codingplan/main/install.sh | bash
 
 set -e
 

@@ -35,9 +35,9 @@ publish = ["build", "twine"]
 codingplan = "codingplan.cli:main"
 
 [project.urls]
-Homepage = "https://gitee.com/project_hub_1/codingplan"
-Repository = "https://gitee.com/project_hub_1/codingplan"
-Documentation = "https://gitee.com/project_hub_1/codingplan/blob/main/README.md"
+Homepage = "https://github.com/hly-AI/codingplan"
+Repository = "https://github.com/hly-AI/codingplan"
+Documentation = "https://github.com/hly-AI/codingplan/blob/main/README.md"
 
 [tool.setuptools.packages.find]
 where = ["."]

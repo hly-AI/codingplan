@@ -20,8 +20,6 @@
 ```bash
 # 使用 pipx（推荐，独立环境，全局可用）
 pipx install git+https://github.com/hly-AI/codingplan.git
-# 或 Gitee: pipx install git+https://gitee.com/project_hub_1/codingplan.git
-
 # 或从 PyPI（发布后）
 pip install codingplan
 # 或 pipx install codingplan
@@ -46,8 +44,8 @@ pip install -e .
 # GitHub（默认）
 curl -fsSL https://raw.githubusercontent.com/hly-AI/codingplan/main/install.sh | bash
 
-# 或 Gitee（国内网络可指定仓库源）
-CODINGPLAN_REPO_URL=https://gitee.com/project_hub_1/codingplan.git bash -c 'curl -fsSL https://gitee.com/project_hub_1/codingplan/raw/main/install.sh | bash'
+# 或指定仓库源（如国内镜像）
+CODINGPLAN_REPO_URL=https://github.com/hly-AI/codingplan.git bash -c 'curl -fsSL https://raw.githubusercontent.com/hly-AI/codingplan/main/install.sh | bash'
 ```
 
 安装后若 `codingplan` 命令不可用，请将 `~/.local/bin` 加入 PATH：
