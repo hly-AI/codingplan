@@ -13,8 +13,10 @@ def main():
     """主入口"""
     import argparse
 
-    # 提前处理 init：确保 "codingplan init" 作为独立子命令可被发现
+    # 提前处理 init：兼容 "codingplan init" 和 "python -m codingplan.cli init"
     if len(sys.argv) > 1 and sys.argv[1] == "init":
+        sys.exit(init_cmd.run_init(Path.cwd()))
+    if "init" in sys.argv and sys.argv[-1] == "init":
         sys.exit(init_cmd.run_init(Path.cwd()))
 
     parser = argparse.ArgumentParser(
@@ -107,6 +109,10 @@ def main():
 
     if not args.req_dir:
         parser.error("请指定需求目录，或使用 'codingplan init' 创建邮件配置模板")
+
+    # 备用：当 req_dir 为 "init" 时执行初始化（兼容旧版或边缘情况）
+    if args.req_dir == "init":
+        sys.exit(init_cmd.run_init(Path.cwd()))
 
     project_root = Path.cwd()
     req_dir = project_root / args.req_dir
