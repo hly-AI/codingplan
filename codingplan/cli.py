@@ -13,19 +13,26 @@ def main():
     """主入口"""
     import argparse
 
+    # 提前处理 init：确保 "codingplan init" 作为独立子命令可被发现
+    if len(sys.argv) > 1 and sys.argv[1] == "init":
+        sys.exit(init_cmd.run_init(Path.cwd()))
+
     parser = argparse.ArgumentParser(
         prog="codingplan",
         description="基于 Cursor CLI 的自动化需求处理、代码实现与测试闭环工具",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
+命令:
+  init                    创建 .codingplan/email.conf、AGENTS.md、Cursor 规则等配置
+  <需求目录>              处理该目录下所有需求文件
+
 示例:
-  codingplan init                     # 创建 .codingplan/email.conf 模板
+  codingplan init                     # 创建配置
   codingplan ./requirements          # 处理 requirements 目录下所有需求
   codingplan ./docs/reqs -r           # 从上次中断处继续
   codingplan ./reqs -f feature-a.md   # 仅处理指定文件
   codingplan ./reqs -s ugc_kmp        # 仅限在 ugc_kmp 目录内实现
   codingplan ./reqs -H "需求含 iOS+Android，请确保两平台都实现"  # 额外提醒
-  codingplan ./reqs -s ugc_kmp -H "需求含 iOS+Android，两平台都要实现"
   codingplan ./reqs -u uidesign           # 指定 UI 设计目录（默认即 uidesign）
   codingplan ./reqs -e user@example.com   # 完成后发邮件通知
 
@@ -97,10 +104,6 @@ def main():
     )
 
     args = parser.parse_args()
-
-    # codingplan init：创建 .codingplan/email.conf 模板
-    if args.req_dir == "init":
-        sys.exit(init_cmd.run_init(Path.cwd()))
 
     if not args.req_dir:
         parser.error("请指定需求目录，或使用 'codingplan init' 创建邮件配置模板")
