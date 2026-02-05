@@ -22,5 +22,6 @@ build/
 *.swp
 *.swo
 
-# CodingPlan state
-.codingplan/
+# CodingPlan state（保留示例配置，忽略含密码的 email.conf）
+.codingplan/*
+!.codingplan/email.conf.example

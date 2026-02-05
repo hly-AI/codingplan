@@ -101,9 +101,72 @@ codingplan ./requirements -f feature-a.md
 
 # 实现范围限制 + 额外提醒（如：需求含 iOS+Android，请确保两平台都实现）
 codingplan ./requirements -s ugc_kmp -H "需求包含 iOS 和 Android 两个 App 端，请确保两个平台都实现"
-codingplan ./ugc_prd/pdf -s ugc_kmp -H "需求包含 iOS 和 Android 两个 App 端，请确保两个平台都实现"
 
+# 完成后发送邮件通知（需先配置 .codingplan/email.conf 或环境变量，未配置则不发送）
+codingplan ./requirements -e user@example.com
 ```
+
+
+### 邮件通知（--notify-email / -e）
+
+**未配置则不发送**。仅在同时满足以下条件时发送邮件：
+- 指定了收件人（`-e` 或配置文件中的默认收件人）
+- 已配置 SMTP（配置文件或环境变量）
+
+#### 快速配置（推荐）
+
+1. 复制示例配置并编辑：
+   ```bash
+   mkdir -p .codingplan
+   cp .codingplan/email.conf.example .codingplan/email.conf
+   # 编辑 .codingplan/email.conf，填写发件邮箱和收件人
+   ```
+
+2. 配置文件格式：
+   ```ini
+   [smtp]
+   host = smtp.qq.com
+   port = 587
+   user = 发件邮箱@qq.com
+   password = QQ邮箱授权码
+
+   [notify]
+   emails = 收件人@example.com
+   ```
+
+3. 配置后直接运行，无需每次加 `-e`：
+   ```bash
+   codingplan ./requirements
+   ```
+
+#### 使用 -e 指定收件人
+
+```bash
+# 覆盖配置文件中的默认收件人
+codingplan ./requirements -e user@example.com
+codingplan ./requirements -e a@x.com -e b@x.com
+```
+
+#### 环境变量方式（可选）
+
+不写配置文件时，可设置环境变量。环境变量会覆盖配置文件中的值。
+
+| 变量 | 说明 |
+|------|------|
+| `CODINGPLAN_SMTP_HOST` | SMTP 服务器（如 smtp.qq.com） |
+| `CODINGPLAN_SMTP_PORT` | 端口，587 或 465 |
+| `CODINGPLAN_SMTP_USER` | 发件邮箱 |
+| `CODINGPLAN_SMTP_PASSWORD` | 密码或授权码 |
+
+```bash
+export CODINGPLAN_SMTP_HOST=smtp.qq.com
+export CODINGPLAN_SMTP_PORT=587
+export CODINGPLAN_SMTP_USER=your@qq.com
+export CODINGPLAN_SMTP_PASSWORD=你的授权码
+codingplan ./requirements -e notify@example.com
+```
+
+更多说明（QQ/163/Gmail 等配置、故障排查）见 [邮件通知说明](docs/EMAIL-NOTIFICATION.md)。
 
 ### 实现范围限制（--scope / -s）
 

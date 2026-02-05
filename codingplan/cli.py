@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 
 from .workflow import run_workflow
+from . import notify
 from . import __version__
 
 
@@ -23,6 +24,7 @@ def main():
   codingplan ./reqs -s ugc_kmp        # 仅限在 ugc_kmp 目录内实现
   codingplan ./reqs -H "需求含 iOS+Android，请确保两平台都实现"  # 额外提醒
   codingplan ./reqs -s ugc_kmp -H "需求含 iOS+Android，两平台都要实现"
+  codingplan ./reqs -e user@example.com   # 完成后发邮件通知
 
 前置条件:
   1. 已安装 Cursor CLI: curl https://cursor.com/install -fsS | bash
@@ -63,6 +65,14 @@ def main():
         help="额外上下文或提醒，会注入到各步骤 prompt 中（如：需求包含 iOS 和 Android，请确保两个平台都实现）",
     )
     parser.add_argument(
+        "-e", "--notify-email",
+        dest="notify_email",
+        type=str,
+        metavar="EMAIL",
+        help="任务完成后发送邮件到此地址（可多次指定）。可配置 .codingplan/email.conf 或环境变量",
+        action="append",
+    )
+    parser.add_argument(
         "-v", "--version",
         action="version",
         version=f"%(prog)s {__version__}",
@@ -81,6 +91,9 @@ def main():
         print(f"错误: 不是目录: {req_dir}")
         sys.exit(1)
 
+    # 收件人：命令行 -e 优先，否则从配置文件 [notify] emails 读取
+    notify_emails = args.notify_email or notify.get_default_notify_emails()
+
     exit_code = run_workflow(
         project_root=project_root,
         req_dir=req_dir,
@@ -88,6 +101,7 @@ def main():
         single_file=args.single_file,
         scope=args.scope,
         hint=args.hint,
+        notify_emails=notify_emails,
     )
     sys.exit(exit_code)
 
