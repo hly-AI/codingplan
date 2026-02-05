@@ -6,7 +6,7 @@ set -e
 
 INSTALL_DIR="${CODINGPLAN_INSTALL_DIR:-$HOME/.local/share/codingplan}"
 BIN_DIR="${CODINGPLAN_BIN_DIR:-$HOME/.local/bin}"
-REPO_URL="${CODINGPLAN_REPO_URL:-https://gitee.com/project_hub_1/codingplan.git}"
+REPO_URL="${CODINGPLAN_REPO_URL:-https://github.com/hly-AI/codingplan.git}"
 
 echo "CodingPlan 安装程序"
 echo "===================="
