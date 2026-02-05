@@ -93,8 +93,11 @@ brew install codingplan
 # 处理指定目录下所有需求文件
 codingplan ./requirements
 
-# 从上次中断处继续
-codingplan ./requirements --resume
+# 中断后再次运行会自动从中断处继续（无需加 -r）
+codingplan ./requirements
+
+# 强制重新开始，忽略上次未完成状态
+codingplan ./requirements --fresh
 
 # 仅处理单个文件
 codingplan ./requirements -f feature-a.md
@@ -167,6 +170,22 @@ codingplan ./requirements -e notify@example.com
 ```
 
 更多说明（QQ/163/Gmail 等配置、故障排查）见 [邮件通知说明](docs/EMAIL-NOTIFICATION.md)。
+
+### 自动续传（中断后继续）
+
+中断后再次运行**同一命令**（相同需求目录），会自动从中断处继续，跳过已完成文件：
+
+```bash
+codingplan ./docs -H "..."
+# 中断后直接再次运行即可
+codingplan ./docs -H "..."
+```
+
+若需强制重新开始，加 `--fresh`：
+
+```bash
+codingplan ./docs --fresh
+```
 
 ### 实现范围限制（--scope / -s）
 

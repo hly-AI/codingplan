@@ -42,7 +42,12 @@ def main():
     parser.add_argument(
         "-r", "--resume",
         action="store_true",
-        help="从上次中断处继续",
+        help="从上次中断处继续（默认会自动检测并续传）",
+    )
+    parser.add_argument(
+        "-F", "--fresh",
+        action="store_true",
+        help="强制重新开始，忽略上次未完成状态",
     )
     parser.add_argument(
         "-f", "--file",
@@ -115,6 +120,7 @@ def main():
         req_dir=req_dir,
         ui_dir=ui_dir,
         resume=args.resume,
+        fresh=args.fresh,
         single_file=args.single_file,
         scope=args.scope,
         hint=args.hint,

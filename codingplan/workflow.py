@@ -200,11 +200,29 @@ def process_project_check(project_root: Path, dirs: dict, scope: Optional[str] =
     return result.returncode == 0
 
 
+def _has_unfinished_state(state_file: Path, req_dir: Path) -> bool:
+    """检测是否存在未完成的状态（同需求目录）"""
+    if not state_file.exists():
+        return False
+    try:
+        with open(state_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return False
+    if data.get("completed"):
+        return False
+    saved_req_dir = data.get("req_dir")
+    if saved_req_dir != str(req_dir):
+        return False
+    return bool(data.get("current_file") or data.get("files_done"))
+
+
 def run_workflow(
     project_root: Path,
     req_dir: Path,
     ui_dir: Optional[Path] = None,
     resume: bool = False,
+    fresh: bool = False,
     single_file: Optional[str] = None,
     scope: Optional[str] = None,
     hint: Optional[str] = None,
@@ -226,6 +244,12 @@ def run_workflow(
     dirs = get_output_dirs(project_root)
     state_file = project_root / ".codingplan" / "state.json"
     state = WorkflowState(state_file)
+
+    # 自动续传：未传 --fresh 且存在未完成状态时，自动从中断处继续
+    if not fresh and _has_unfinished_state(state_file, req_dir):
+        resume = True
+        print("检测到上次未完成，自动从中断处继续（使用 --fresh 可强制重新开始）")
+
     if resume:
         state.load()
         # 恢复时沿用上次的 scope、hint（若本次未指定）
@@ -237,8 +261,8 @@ def run_workflow(
         state.data["scope"] = scope
     if hint:
         state.data["hint"] = hint
-    if scope or hint:
-        state.save()
+    state.data["req_dir"] = str(req_dir)
+    state.save()
 
     files = collect_requirement_files(req_dir)
     if not files:
@@ -250,6 +274,13 @@ def run_workflow(
         if not files:
             print(f"未找到文件: {single_file}")
             return 1
+
+    # 续传时跳过已完成文件
+    if resume:
+        files_done_names = {Path(p).name for p in state.data.get("files_done", [])}
+        files = [f for f in files if f.name not in files_done_names]
+        if files:
+            print(f"续传: 跳过 {len(files_done_names)} 个已完成，剩余 {len(files)} 个待处理")
 
     notify_emails = notify_emails or []
     files_done: list[str] = []
@@ -303,6 +334,9 @@ def run_workflow(
 
     duration_str = _print_duration(start_time)
     print("\n所有需求处理完成。")
+    state.data["completed"] = True
+    state.data["current_file"] = None
+    state.save()
     if notify_emails:
         notify.send_workflow_complete(
             notify_emails,
