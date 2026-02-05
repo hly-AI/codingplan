@@ -83,9 +83,10 @@ shasum -a 256 /tmp/codingplan.tar.gz
 
 将输出的 sha256 填入 `codingplan.rb` 的 `sha256 ""` 中。
 
-**注意**：若 Homebrew 下载失败，可尝试 zip 格式：
+**注意**：若 Homebrew 下载失败，可尝试：
 
-- `https://github.com/hly-AI/codingplan/archive/refs/tags/v0.1.0.zip`
+- `https://github.com/hly-AI/codingplan/archive/refs/tags/v0.1.0.zip`（zip 格式）
+- 或使用 GitHub 的 release 归档
 
 ### 用户安装
 

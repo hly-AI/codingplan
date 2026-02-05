@@ -20,6 +20,7 @@
 ```bash
 # 使用 pipx（推荐，独立环境，全局可用）
 pipx install git+https://github.com/hly-AI/codingplan.git
+
 # 或从 PyPI（发布后）
 pip install codingplan
 # 或 pipx install codingplan
@@ -63,7 +64,7 @@ brew install codingplan
 # 若尚未发布 tag，可使用: brew install codingplan --HEAD
 ```
 
-详见 [发布说明](docs/PUBLISH.md)。
+需先创建 [homebrew-codingplan](https://github.com/hly-AI/homebrew-codingplan) 仓库并放入 Formula，详见 [发布说明](docs/PUBLISH.md)。
 
 ### 安装方式说明
 
@@ -87,7 +88,7 @@ brew install codingplan
 |----------|----------|
 | **pipx** | `pipx upgrade codingplan` 或 `pipx install --force git+https://github.com/hly-AI/codingplan.git` |
 | **pip (venv)** | `pip install --upgrade codingplan` 或 `pip install --upgrade git+https://github.com/hly-AI/codingplan.git` |
-| **curl 一键** | 再次执行 `curl -fsSL https://raw.githubusercontent.com/hly-AI/codingplan/main/install.sh \| bash` |
+| **curl 一键** | 再次执行 `curl -fsSL https://raw.githubusercontent.com/hly-AI/codingplan/main/install.sh \| bash`（会拉取最新并重装） |
 | **本地开发** | `cd codingplan && git pull && pip install -e .` |
 | **Homebrew** | `brew upgrade codingplan` 或 `brew upgrade codingplan --fetch-HEAD`（若用 `--HEAD` 安装） |
 
