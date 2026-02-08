@@ -48,7 +48,27 @@
 ### 使用方式
 
 - **未显式使用**：CodingPlan 代码中**没有**读取或配置 Cursor Skills。
-- Skills 是 Cursor 的全局能力，若用户环境中有（如 `.cursor/skills/` 下的技能），Agent 在目标项目中运行时可能会用到，但这不是 CodingPlan 专门设计的部分。
+- Skills 是 Cursor 的全局能力，若用户环境中有（如 `.cursor/skills/` 下的技能），Agent 在目标项目中运行时可能会用到。
+
+### 推荐 Skills
+
+CodingPlan 项目提供以下 Skills，位于 `.cursor/skills/`，可提升各步骤产出质量：
+
+| Skill | 适用步骤 | 说明 |
+|-------|----------|------|
+| `codingplan-test-design` | Step 6 测试设计 | 测试设计文档结构、用例格式、边界/异常场景 |
+| `codingplan-requirement` | Step 2 需求补全 | 需求文档结构、功能范围、验收标准 |
+| `codingplan-detail-design` | Step 4 详细设计 | 详细设计结构、模块、接口、数据结构 |
+| `codingplan-outline` | Step 3 概要设计 | 概要设计文档结构、架构与流程；可与 hld-mermaid-diagrams 配合 |
+| `codingplan-implement` | Step 5 代码实现 | 实现检查清单、Plan 模式步骤、实现顺序 |
+| `codingplan-test-impl` | Step 7 测试实现 | 测试代码结构、命名、Mock 原则、检查清单 |
+
+**额外推荐**（需另行安装）：`hld-mermaid-diagrams` 可提升 Step 3 概要设计的 Mermaid 图表质量。
+
+### 使用 Skills
+
+- **存放位置**：Skills 位于 CodingPlan 仓库 `.cursor/skills/` 下，作为源文件。
+- **处理其他项目时**：`codingplan ./requirements` 的工作目录是目标项目，Agent 读取目标项目的 `.cursor/skills/` 或全局 `~/.cursor/skills/`。因此需将六个 skill 目录复制到目标项目的 `.cursor/skills/`，或复制到 `~/.cursor/skills/`（对本机所有项目生效）。
 
 ---
 
@@ -77,7 +97,7 @@
 | **.codingplan/email.conf** | 邮件通知。`codingplan init` 会创建模板，填写 SMTP 和收件人后，完成时可发送通知。 |
 | **uidesign/** | UI 设计目录。若有 Figma 链接与交互说明，可放在此目录（或 `-u` 指定），Agent 会参照实现 UI。 |
 | **Figma MCP** | 需求涉及 UI 时，在 Cursor 中启用 Figma MCP，Agent 可获取设计稿。 |
-| **Skills** | 若项目有专项需求（如 HLD Mermaid 图、特定框架），可在 `.cursor/skills/` 或全局 skills 中配置。 |
+| **Skills** | CodingPlan 提供 6 个 Skills（test-design、requirement、detail-design、outline、implement、test-impl）；推荐额外安装 `hld-mermaid-diagrams` 提升概要设计图表。 |
 
 ### 4.4 项目结构约定
 
@@ -96,7 +116,7 @@
 |---------|--------------------------------------------------------------------------|
 | **Rules** | 通过 `codingplan init` 写入目标项目的 `AGENTS.md`、`.cursor/rules/`     |
 | **Prompts** | 由 `prompts.py` 生成，作为 `agent -p <prompt>` 的参数传入                 |
-| **Skills** | 未显式使用；依赖用户已有的 Cursor Skills 配置                            |
+| **Skills** | 项目提供 6 个 Skills；推荐 hld-mermaid-diagrams；Agent 按需自动应用 |
 
 ---
 

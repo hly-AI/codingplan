@@ -312,6 +312,19 @@ codingplan ./requirements -s ugc_kmp -H "需兼容暗色模式，设计时考虑
 
 工具会读取项目中的 `.cursor/rules`、`AGENTS.md`、`CLAUDE.md` 作为 Agent 的上下文规则。建议在项目中添加与需求处理相关的规则。
 
+### 推荐 Skills
+
+CodingPlan 提供 3 个 Skills 以提升各步骤产出质量，详见 [Rules、Prompts、Skills 说明](docs/CODINGPLAN-RULES-PROMPTS-SKILLS.md#3-skills技能)：
+
+- `codingplan-test-design` - 测试设计（Step 6）
+- `codingplan-requirement` - 需求补全（Step 2）
+- `codingplan-detail-design` - 详细设计（Step 4）
+- `codingplan-outline` - 概要设计（Step 3）
+- `codingplan-implement` - 代码实现（Step 5）
+- `codingplan-test-impl` - 测试实现（Step 7）
+
+将 `.cursor/skills/` 下 6 个目录复制到目标项目的 `.cursor/skills/` 或 `~/.cursor/skills/` 即可使用。另推荐安装 `hld-mermaid-diagrams` 以提升概要设计图表质量。
+
 ## 许可证
 
 MIT
