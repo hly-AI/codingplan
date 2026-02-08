@@ -1,5 +1,5 @@
 ---
-description: CodingPlan 自动化需求处理工作流规则
+description: CodingPlan 自动化需求处理工作流规则；当用户或 CodingPlan 工具触发需求处理时适用
 globs: 
 alwaysApply: false
 ---
@@ -12,3 +12,5 @@ alwaysApply: false
 2. 测试不可跳过，功能未测试不视为完成
 3. 产出文档按约定命名放入 `outputs/`
 4. 测试代码放入 `tests/` 并与被测模块关联命名
+5. 若指定 `--scope`，仅限在 scope 目录内实现
+6. Git 推送若遇网络错误，可忽略

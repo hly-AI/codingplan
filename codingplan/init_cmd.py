@@ -22,7 +22,12 @@ emails = 请填写收件人@example.com
 
 AGENTS_MD_TEMPLATE = """# CodingPlan 工作流规则
 
-当执行 CodingPlan 自动化需求处理时，Agent 必须遵守以下规则：
+当执行 CodingPlan 自动化需求处理时，Agent 必须遵守以下规则。
+项目上下文见 CLAUDE.md。
+
+## 工作流步骤
+
+1. 文档规范化 → 2. 需求补全 → 3. 概要设计 → 4. 详细设计 → 5. 代码实现 → 6. 测试设计 → 7. 测试实现 → 8. 编译运行测试 → 9. 完成度校验 → 10. 项目整体检查 → 11. 项目级补充
 
 ## 强制规则
 
@@ -32,6 +37,8 @@ AGENTS_MD_TEMPLATE = """# CodingPlan 工作流规则
 - ✅ 测试失败必须进入 Ask → 修复 → 重试
 - ✅ 每个需求文件必须形成完整闭环
 - ✅ 所有需求完成后必须进行项目级整体与测试检查
+- ✅ 若指定 `--scope`，仅限在 scope 目录内实现和修改代码
+- ✅ Git 推送若遇网络错误（Connection stalled、timeout），可忽略，本地提交已足够
 
 ## 输出目录
 
@@ -46,10 +53,19 @@ AGENTS_MD_TEMPLATE = """# CodingPlan 工作流规则
 - `{需求名}-outline-design.md` - 概要设计
 - `{需求名}-detail-design.md` - 详细设计
 - `{需求名}-test-design.md` - 测试设计
+
+## 需求文件
+
+支持格式：`.md`、`.txt`、`.docx`、`.pdf`。若涉及 UI，可将 Figma 链接与交互说明放入 `uidesign/` 目录，文件名与需求对应。
+
+## 多端/多平台
+
+当需求涉及多端（后端、管理后台、官网、App、小程序等）时，设计与实现需覆盖所有相关端，不得遗漏。
+常见类型：后端/API、管理后台、官网、App（iOS/Android/鸿蒙；Flutter/Swift/Kotlin/KMP）、Uniapp/小程序等。
 """
 
 CURSOR_RULE_TEMPLATE = """---
-description: CodingPlan 自动化需求处理工作流规则
+description: CodingPlan 自动化需求处理工作流规则；当用户或 CodingPlan 工具触发需求处理时适用
 globs: 
 alwaysApply: false
 ---
@@ -62,6 +78,21 @@ alwaysApply: false
 2. 测试不可跳过，功能未测试不视为完成
 3. 产出文档按约定命名放入 `outputs/`
 4. 测试代码放入 `tests/` 并与被测模块关联命名
+5. 若指定 `--scope`，仅限在 scope 目录内实现
+6. Git 推送若遇网络错误，可忽略
+"""
+
+MULTI_PLATFORM_RULE_TEMPLATE = """---
+description: 当需求涉及多端（后端、管理后台、官网、App、小程序等）时适用；多端实现与检查规则
+globs: 
+alwaysApply: false
+---
+
+# 多端/多平台规则
+
+当需求涉及多端时，设计与实现需覆盖所有相关端，不得遗漏。
+
+常见项目类型：后端/API、管理后台、官网、App（iOS/Android/鸿蒙；Flutter/Swift/Kotlin/KMP）、Uniapp/小程序等。
 """
 
 CLAUDE_MD_TEMPLATE = """# 项目上下文
@@ -76,7 +107,7 @@ CLAUDE_MD_TEMPLATE = """# 项目上下文
 
 ## 技术栈
 
-（语言、框架、数据库、构建工具、第三方依赖等）
+（项目类型 + 技术选型，如：后端/API、管理后台、官网、App（iOS/Android/鸿蒙；Flutter/Swift/Kotlin/KMP）、Uniapp/小程序；语言、框架、数据库、构建工具等）
 
 ## 架构与目录
 
@@ -97,6 +128,10 @@ CLAUDE_MD_TEMPLATE = """# 项目上下文
 ## 注意事项
 
 （禁止事项、易错点、特殊约定、外部依赖说明等）
+
+## UI 设计（若涉及）
+
+（Figma 链接约定、交互说明、uidesign/ 目录结构等；使用 CodingPlan 处理需求时可在此说明）
 """
 
 GITIGNORE_ENTRIES = """
@@ -127,7 +162,8 @@ def run_init(project_root: Optional[Path] = None) -> int:
 
     - .codingplan/email.conf - 邮件配置模板
     - AGENTS.md - 工作流规则（若不存在）
-    - .cursor/rules/codingplan-workflow.mdc - Cursor 规则（若不存在）
+    - .cursor/rules/codingplan-workflow.mdc - Cursor 工作流规则（若不存在）
+    - .cursor/rules/multi-platform.mdc - 多端/多平台规则（若不存在）
     - CLAUDE.md - 项目上下文（若不存在），供 Cursor Agent 读取
     - .gitignore - 追加 email.conf 等忽略项（若尚未包含）
 
@@ -156,13 +192,22 @@ def run_init(project_root: Optional[Path] = None) -> int:
         created.append(str(agents_md))
 
     # 3. .cursor/rules/codingplan-workflow.mdc
-    cursor_rule = root / ".cursor" / "rules" / "codingplan-workflow.mdc"
+    rules_dir = root / ".cursor" / "rules"
+    rules_dir.mkdir(parents=True, exist_ok=True)
+    cursor_rule = rules_dir / "codingplan-workflow.mdc"
     if cursor_rule.exists():
         print(f"已存在: {cursor_rule}")
     else:
-        cursor_rule.parent.mkdir(parents=True, exist_ok=True)
         cursor_rule.write_text(CURSOR_RULE_TEMPLATE, encoding="utf-8")
         created.append(str(cursor_rule))
+
+    # 3b. .cursor/rules/multi-platform.mdc（多端/多平台规则）
+    multi_platform_rule = rules_dir / "multi-platform.mdc"
+    if multi_platform_rule.exists():
+        print(f"已存在: {multi_platform_rule}")
+    else:
+        multi_platform_rule.write_text(MULTI_PLATFORM_RULE_TEMPLATE, encoding="utf-8")
+        created.append(str(multi_platform_rule))
 
     # 4. CLAUDE.md（项目上下文，供 Cursor Agent 读取）
     claude_md = root / "CLAUDE.md"

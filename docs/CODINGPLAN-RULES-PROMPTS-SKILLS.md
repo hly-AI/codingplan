@@ -9,8 +9,9 @@
 ### 使用方式
 
 - **注入到目标项目**：执行 `codingplan init` 时，会在**目标项目**（你要处理的项目）中创建：
-  - `AGENTS.md`：工作流规则
-  - `.cursor/rules/codingplan-workflow.mdc`：Cursor 规则
+  - `AGENTS.md`：工作流规则（含多端/多平台约定）
+  - `.cursor/rules/codingplan-workflow.mdc`：Cursor 工作流规则
+  - `.cursor/rules/multi-platform.mdc`：多端/多平台规则（后端、管理后台、官网、App、小程序等）
   - `CLAUDE.md`：项目上下文模板（项目背景、技术栈、编码规范等）
 
 - **在目标项目中生效**：执行 `codingplan ./requirements` 时，工作目录是**目标项目**，调用 Cursor Agent 时，Agent 会读取该项目的 `.cursor/rules`、`AGENTS.md`、`CLAUDE.md` 等规则。
@@ -60,7 +61,7 @@
 | 项目 | 说明 |
 |------|------|
 | **CLAUDE.md** | 项目根目录放置，Agent 会读取。可写项目背景、技术栈、编码规范等。`codingplan init` 会创建模板，填写后供 Agent 参考。 |
-| **其他 .cursor/rules** | 可增加项目专属规则（如代码风格、框架约定、禁止事项），与 `codingplan-workflow.mdc` 一并生效。 |
+| **其他 .cursor/rules** | 可增加项目专属规则（如代码风格、框架约定、禁止事项），与 `codingplan-workflow.mdc`、`multi-platform.mdc` 一并生效。 |
 
 ### 4.3 可选配置
 

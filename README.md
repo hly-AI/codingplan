@@ -109,7 +109,8 @@ codingplan init
 |------|------|
 | `.codingplan/email.conf` | 邮件配置模板，需填写发件邮箱、授权码、收件人 |
 | `AGENTS.md` | 工作流规则，供 Agent 遵守 |
-| `.cursor/rules/codingplan-workflow.mdc` | Cursor 规则 |
+| `.cursor/rules/codingplan-workflow.mdc` | Cursor 工作流规则 |
+| `.cursor/rules/multi-platform.mdc` | 多端/多平台规则 |
 | `CLAUDE.md` | 项目上下文（项目背景、技术栈、编码规范等），供 Cursor Agent 读取 |
 | `.gitignore` | 追加 `.codingplan/email.conf`、`state.json` 忽略项 |
 
@@ -150,7 +151,7 @@ codingplan ./requirements -e user@example.com
    ```bash
    cd /path/to/your/project
    codingplan init
-   # 会创建：.codingplan/email.conf、AGENTS.md、.cursor/rules/、CLAUDE.md、.gitignore 条目
+   # 会创建：.codingplan/email.conf、AGENTS.md、.cursor/rules/（含 codingplan-workflow、multi-platform）、CLAUDE.md、.gitignore 条目
    # 编辑 .codingplan/email.conf，将占位符替换为实际值
    ```
 

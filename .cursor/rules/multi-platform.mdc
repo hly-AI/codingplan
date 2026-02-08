@@ -1,0 +1,11 @@
+---
+description: 当需求涉及多端（后端、管理后台、官网、App、小程序等）时适用；多端实现与检查规则
+globs: 
+alwaysApply: false
+---
+
+# 多端/多平台规则
+
+当需求涉及多端时，设计与实现需覆盖所有相关端，不得遗漏。
+
+常见项目类型：后端/API、管理后台、官网、App（iOS/Android/鸿蒙；Flutter/Swift/Kotlin/KMP）、Uniapp/小程序等。

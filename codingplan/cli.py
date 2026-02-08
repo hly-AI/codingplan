@@ -25,7 +25,7 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 命令:
-  init                    创建 .codingplan/email.conf、AGENTS.md、Cursor 规则等配置
+  init                    创建 .codingplan/email.conf、AGENTS.md、Cursor 规则（含 multi-platform）等配置
   <需求目录>              处理该目录下所有需求文件
 
 示例:
