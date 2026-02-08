@@ -64,6 +64,41 @@ alwaysApply: false
 4. 测试代码放入 `tests/` 并与被测模块关联命名
 """
 
+CLAUDE_MD_TEMPLATE = """# 项目上下文
+
+> 由 codingplan init 创建。请填写项目背景、技术栈、编码规范等，供 Cursor Agent 在需求处理时参考。
+> Cursor CLI 会读取本文件作为 Agent 的持久上下文。
+> 撰写指南：https://claude.com/blog/using-claude-md-files
+
+## 项目概述
+
+（简要描述项目用途、核心功能、目标用户）
+
+## 技术栈
+
+（语言、框架、数据库、构建工具、第三方依赖等）
+
+## 架构与目录
+
+（整体架构说明；关键目录：src/、app/、backend/、frontend/ 等及其职责）
+
+## 编码规范
+
+（命名约定、代码风格、测试框架、Lint 规则等）
+
+## 常用命令
+
+```bash
+# 启动
+# 构建
+# 测试
+```
+
+## 注意事项
+
+（禁止事项、易错点、特殊约定、外部依赖说明等）
+"""
+
 GITIGNORE_ENTRIES = """
 # CodingPlan（由 codingplan init 添加）
 .codingplan/email.conf
@@ -93,6 +128,7 @@ def run_init(project_root: Optional[Path] = None) -> int:
     - .codingplan/email.conf - 邮件配置模板
     - AGENTS.md - 工作流规则（若不存在）
     - .cursor/rules/codingplan-workflow.mdc - Cursor 规则（若不存在）
+    - CLAUDE.md - 项目上下文（若不存在），供 Cursor Agent 读取
     - .gitignore - 追加 email.conf 等忽略项（若尚未包含）
 
     Returns:
@@ -128,7 +164,15 @@ def run_init(project_root: Optional[Path] = None) -> int:
         cursor_rule.write_text(CURSOR_RULE_TEMPLATE, encoding="utf-8")
         created.append(str(cursor_rule))
 
-    # 4. .gitignore
+    # 4. CLAUDE.md（项目上下文，供 Cursor Agent 读取）
+    claude_md = root / "CLAUDE.md"
+    if claude_md.exists():
+        print(f"已存在: {claude_md}")
+    else:
+        claude_md.write_text(CLAUDE_MD_TEMPLATE, encoding="utf-8")
+        created.append(str(claude_md))
+
+    # 5. .gitignore
     if _ensure_gitignore(root):
         created.append(".gitignore（已追加 CodingPlan 忽略项）")
 
@@ -140,4 +184,6 @@ def run_init(project_root: Optional[Path] = None) -> int:
         print("")
         if str(conf_file) in created:
             print("请编辑 .codingplan/email.conf，将占位符替换为实际值（发件邮箱、授权码、收件人）")
+        if str(claude_md) in created:
+            print("请编辑 CLAUDE.md，填写项目背景、技术栈、编码规范等，以提升 Agent 对项目的理解")
     return 0

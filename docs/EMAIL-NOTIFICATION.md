@@ -38,7 +38,7 @@ CodingPlan 在任务**完成**（无论成功或失败）后，可向指定邮�
 ```bash
 cd /path/to/your/project
 codingplan init
-# 会创建：.codingplan/email.conf、AGENTS.md、.cursor/rules/codingplan-workflow.mdc，并更新 .gitignore
+# 会创建：.codingplan/email.conf、AGENTS.md、.cursor/rules/、CLAUDE.md，并更新 .gitignore
 # 编辑 .codingplan/email.conf，将占位符替换为实际值
 ```
 
