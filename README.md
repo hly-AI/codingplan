@@ -310,7 +310,7 @@ codingplan ./requirements -s ugc_kmp -H "需兼容暗色模式，设计时考虑
 
 ## 配置
 
-工具会读取项目中的 `.cursor/rules`、`AGENTS.md`、`CLAUDE.md` 作为 Agent 的上下文规则。建议在项目中添加与需求处理相关的规则。
+工具会读取项目中的 `.cursor/rules`、`AGENTS.md`、`CLAUDE.md` 作为 Agent 的上下文规则。建议在项目中添加与需求处理相关的规则。五类配置的区别与协作详见 [AGENTS、CLAUDE、Rules、Prompts、Skills 说明](docs/AGENTS-CLAUDE-RULES-PROMPTS-SKILLS.md)。
 
 ### 推荐 Skills
 

@@ -2,6 +2,8 @@
 
 本文档说明 CodingPlan 如何通过 rules、prompts 等机制处理其他项目。
 
+**延伸阅读**：[AGENTS.md、CLAUDE.md、Rules、Prompts、Skills 的区别、关系与协作](AGENTS-CLAUDE-RULES-PROMPTS-SKILLS.md) —— 详细说明五类配置的区别、关系及在软件开发中的协作方式。
+
 ---
 
 ## 1. Rules（规则）
