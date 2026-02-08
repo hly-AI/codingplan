@@ -223,10 +223,8 @@ def step8_build_test(scope: Optional[str] = None, hint: Optional[str] = None) ->
 3. 执行测试（强制）
 
 若出现编译失败、运行失败或测试失败：
-- 使用 Ask 能力分析错误原因
-- 获取修复建议
-- 修改代码或测试
-- 重新执行本步骤
+- 工具会启动 Ask 分析；请根据终端输出或自身分析，在下一轮重试时修复问题
+- 修改代码或测试后，本步骤将被重新执行
 
 循环直至编译成功、运行成功、测试全部通过，或确认无法继续解决。
 """
@@ -247,8 +245,8 @@ def step9_validate(req_path: str, base_name: str, scope: Optional[str] = None, h
 - 是否存在未验证的关键路径
 
 若未达到 100%，判断是否可继续实现：
-- 是 → 回到 Step 5 或 Step 7
-- 否 → 记录原因到 uncertain/
+- 可继续 → 在本轮中补充实现与测试
+- 无法继续 → 将原因记录到 uncertain/
 
 输出当前需求最终完成状态说明到 outputs/{base_name}-completion-status.md
 """
