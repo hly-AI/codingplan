@@ -1,0 +1,12 @@
+---
+description: 当需求涉及后端/API 时适用；RESTful、版本、错误格式
+globs: 
+alwaysApply: false
+---
+
+# API 设计规则
+
+- 遵循 RESTful 约定：资源用名词、HTTP 方法表达动作、合理使用状态码
+- API 版本：通过路径（如 `/api/v1/`）或 Header 表达；若项目已有约定则遵循
+- 统一错误响应格式：含 code、message、明细（若适用）；HTTP 状态码与业务码配合
+- 分页、排序、过滤参数命名与项目既有 API 一致

@@ -111,6 +111,13 @@ codingplan init
 | `AGENTS.md` | 工作流规则，供 Agent 遵守 |
 | `.cursor/rules/codingplan-workflow.mdc` | Cursor 工作流规则 |
 | `.cursor/rules/multi-platform.mdc` | 多端/多平台规则 |
+| `.cursor/rules/security.mdc` | 安全与隐私规则 |
+| `.cursor/rules/code-quality.mdc` | 代码质量规则 |
+| `.cursor/rules/ui-implementation.mdc` | UI 实现规则 |
+| `.cursor/rules/testing.mdc` | 测试规则 |
+| `.cursor/rules/api-design.mdc` | API 设计规则 |
+| `.cursor/rules/error-handling.mdc` | 错误处理与日志规则 |
+| `.cursor/rules/database.mdc` | 数据库规则 |
 | `CLAUDE.md` | 项目上下文（项目背景、技术栈、编码规范等），供 Cursor Agent 读取 |
 | `.gitignore` | 追加 `.codingplan/email.conf`、`state.json` 忽略项 |
 
@@ -151,7 +158,7 @@ codingplan ./requirements -e user@example.com
    ```bash
    cd /path/to/your/project
    codingplan init
-   # 会创建：.codingplan/email.conf、AGENTS.md、.cursor/rules/（含 codingplan-workflow、multi-platform）、CLAUDE.md、.gitignore 条目
+   # 会创建：.codingplan/email.conf、AGENTS.md、.cursor/rules/（含 9 个规则文件）、CLAUDE.md、.gitignore 条目
    # 编辑 .codingplan/email.conf，将占位符替换为实际值
    ```
 

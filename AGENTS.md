@@ -40,3 +40,31 @@
 
 当需求涉及多端（后端、管理后台、官网、App、小程序等）时，设计与实现需覆盖所有相关端，不得遗漏。
 常见类型：后端/API、管理后台、官网、App（iOS/Android/鸿蒙；Flutter/Swift/Kotlin/KMP）、Uniapp/小程序等。
+
+## 安全与隐私
+
+见 `.cursor/rules/security.mdc`：不硬编码敏感信息、输入校验、日志脱敏。
+
+## 代码质量
+
+见 `.cursor/rules/code-quality.mdc`：可读性优先、风格一致、依赖管理、提交规范、文档同步。
+
+## UI 实现
+
+见 `.cursor/rules/ui-implementation.mdc`：Figma 对照、响应式、无障碍、国际化。
+
+## 测试
+
+见 `.cursor/rules/testing.mdc`：核心逻辑覆盖、测试类型、测试组织。
+
+## API 设计
+
+见 `.cursor/rules/api-design.mdc`：RESTful、版本、错误格式（涉及后端/API 时适用）。
+
+## 错误处理与日志
+
+见 `.cursor/rules/error-handling.mdc`：异常处理、日志级别、敏感信息。
+
+## 数据库
+
+见 `.cursor/rules/database.mdc`：Schema 设计、迁移、数据兼容（涉及数据库时适用）。
