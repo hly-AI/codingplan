@@ -12,7 +12,7 @@ def _scope_constraint(scope: Optional[str]) -> str:
     return f"""
 ## 实现范围限制（必须遵守）
 
-**仅限在 {scope}/ 目录内实现和修改代码**。其他目录（如 ugc_backend、ugc_admin、ugc_flutter 等）已有实现，请勿修改。
+**仅限在 {scope}/ 目录内实现和修改代码**。其他目录已有实现，请勿修改。
 - 代码实现、测试代码、编译运行均只针对 {scope}/ 范围内
 - 设计文档应聚焦 {scope}/ 的架构与实现
 """
@@ -55,10 +55,12 @@ def _figma_block(figma: Optional[FigmaInfo]) -> str:
 
 WORKFLOW_CONTEXT = """
 你正在执行「基于 Cursor CLI 的自动化需求处理闭环流程」。必须遵守以下规则：
+- 请遵守项目中的 AGENTS.md、.cursor/rules/、CLAUDE.md 规则
 - 任意阶段出现不确定内容，必须写入 uncertain/ 目录
 - 测试是强制阶段，不得跳过
 - 功能未测试不视为完成
 - 测试失败必须分析原因、修复、重试
+- 若需求涉及多端（后端、管理后台、官网、App、小程序等），确保各端均有实现
 - **Git 推送**：若执行 git push 时出现 Connection stalled、timeout 等网络错误，可忽略，本地提交已足够，不影响工作流完成判定
 """
 
@@ -71,13 +73,13 @@ def step1_normalize(file_path: str, content_preview: str, hint: Optional[str] = 
 
 ## 任务：文档规范化
 
-1. 读取文件：{file_path}
+1. 读取文件：{file_path}（若需完整内容请自行读取）
 2. 若文件不是 .md 格式，将内容转换为标准 Markdown
 3. 输出标准化 Markdown 文档到 outputs/ 目录，命名为：{_base_name(file_path)}-normalized.md
 
-当前文件内容预览（前 500 字符）：
+当前文件内容预览（前 1000 字符）：
 ---
-{content_preview[:500]}
+{content_preview[:1000]}
 ---
 """
 
@@ -190,12 +192,11 @@ def step6_test_design(req_path: str, detail_path: str, base_name: str, scope: Op
 """
 
 
-def step7_test_impl(test_design_path: str, scope: Optional[str] = None, hint: Optional[str] = None, figma: Optional[FigmaInfo] = None) -> str:
+def step7_test_impl(test_design_path: str, scope: Optional[str] = None, hint: Optional[str] = None) -> str:
     """Step 7: 测试代码实现"""
     return f"""
 {WORKFLOW_CONTEXT}
 {_scope_constraint(scope)}
-{_figma_block(figma)}
 {_hint_block(hint)}
 
 ## 任务：测试代码实现
@@ -231,7 +232,7 @@ def step8_build_test(scope: Optional[str] = None, hint: Optional[str] = None) ->
 """
 
 
-def step9_validate(req_path: str, scope: Optional[str] = None, hint: Optional[str] = None) -> str:
+def step9_validate(req_path: str, base_name: str, scope: Optional[str] = None, hint: Optional[str] = None) -> str:
     """Step 9: 单需求完成度校验"""
     return f"""
 {WORKFLOW_CONTEXT}
@@ -249,7 +250,7 @@ def step9_validate(req_path: str, scope: Optional[str] = None, hint: Optional[st
 - 是 → 回到 Step 5 或 Step 7
 - 否 → 记录原因到 uncertain/
 
-输出当前需求最终完成状态说明到 outputs/
+输出当前需求最终完成状态说明到 outputs/{base_name}-completion-status.md
 """
 
 

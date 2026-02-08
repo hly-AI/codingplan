@@ -53,6 +53,7 @@ AGENTS_MD_TEMPLATE = """# CodingPlan 工作流规则
 - `{需求名}-outline-design.md` - 概要设计
 - `{需求名}-detail-design.md` - 详细设计
 - `{需求名}-test-design.md` - 测试设计
+- `{需求名}-completion-status.md` - 完成度校验结果
 
 ## 需求文件
 

@@ -75,7 +75,7 @@ def process_single_file(
         content = req_file.read_text(encoding="utf-8", errors="replace")
         # 移除 null 字节，避免 subprocess 报 "ValueError: embedded null byte"（PDF 等可能包含）
         content = content.replace("\x00", "")
-        prompt = prompts.step1_normalize(str(req_file), content, hint=hint)
+        prompt = prompts.step1_normalize(str(req_file), content[:1000], hint=hint)
         result = run_agent(prompt, cwd=project_root)
         if result.returncode != 0:
             return False
@@ -135,7 +135,7 @@ def process_single_file(
     # Step 7: 测试实现
     if start_step <= 7:
         td_input = test_design_path if test_design_path.exists() else dirs["outputs"] / f"{base_name}-test-design.md"
-        prompt = prompts.step7_test_impl(str(td_input), scope=scope, hint=hint, figma=figma_info)
+        prompt = prompts.step7_test_impl(str(td_input), scope=scope, hint=hint)
         result = run_plan(prompt, cwd=project_root)
         if result.returncode != 0:
             return False
@@ -159,7 +159,7 @@ def process_single_file(
 
     # Step 9: 完成度校验
     if start_step <= 9:
-        prompt = prompts.step9_validate(str(req_path), scope=scope, hint=hint)
+        prompt = prompts.step9_validate(str(req_path), base_name, scope=scope, hint=hint)
         result = run_agent(prompt, cwd=project_root)
         if result.returncode != 0:
             return False
