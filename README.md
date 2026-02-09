@@ -141,9 +141,14 @@ codingplan ./requirements -f feature-a.md
 # 实现范围限制 + 额外提醒（如：需求含 iOS+Android，请确保两平台都实现）
 codingplan ./requirements -s ugc_kmp -H "需求包含 iOS 和 Android 两个 App 端，请确保两个平台都实现"
 
+# 单步超时（秒，默认 3600）
+codingplan ./requirements -t 7200
+
 # 完成后发送邮件通知（需先配置 .codingplan/email.conf 或环境变量，未配置则不发送）
 codingplan ./requirements -e user@example.com
 ```
+
+运行时会输出步骤进度，并在 `.codingplan/logs/codingplan.log` 记录各步骤耗时与状态；失败时会打印失败步骤与建议。
 
 
 ### 邮件通知（--notify-email / -e）
@@ -273,7 +278,7 @@ codingplan ./requirements -s ugc_kmp -H "需兼容暗色模式，设计时考虑
 | `uncertain/` | 所有不确定、待确认内容 |
 | `outputs/` | 需求、设计、测试设计等产出文档 |
 | `tests/` | 自动生成的测试代码 |
-| `.codingplan/` | 工作流状态（用于 --resume） |
+| `.codingplan/` | 工作流状态（用于 --resume）、`logs/codingplan.log` 运行日志 |
 | `uidesign/` | 默认 UI 设计目录（Figma 链接与交互说明），可用 `-u` 指定其他目录 |
 
 ### 支持的需求文件格式
@@ -324,6 +329,11 @@ CodingPlan 提供 3 个 Skills 以提升各步骤产出质量，详见 [Rules、
 - `codingplan-test-impl` - 测试实现（Step 7）
 
 将 `.cursor/skills/` 下 6 个目录复制到目标项目的 `.cursor/skills/` 或 `~/.cursor/skills/` 即可使用。另推荐安装 `hld-mermaid-diagrams` 以提升概要设计图表质量。
+
+### 故障排查与示例
+
+- [故障排查](docs/TROUBLESHOOTING.md)：常见问题、典型错误及解决办法
+- [示例项目](docs/EXAMPLE.md)：快速运行 demo 需求
 
 ## 许可证
 

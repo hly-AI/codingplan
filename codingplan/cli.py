@@ -1,5 +1,6 @@
 """CodingPlan CLI 入口"""
 
+import os
 import sys
 from pathlib import Path
 
@@ -37,6 +38,7 @@ def main():
   codingplan ./reqs -H "需求含 iOS+Android，请确保两平台都实现"  # 额外提醒
   codingplan ./reqs -u uidesign           # 指定 UI 设计目录（默认即 uidesign）
   codingplan ./reqs -e user@example.com   # 完成后发邮件通知
+  codingplan ./reqs -t 7200               # 单步超时 2 小时（默认 1 小时）
 
 前置条件:
   1. 已安装 Cursor CLI: curl https://cursor.com/install -fsS | bash
@@ -100,12 +102,22 @@ def main():
         action="append",
     )
     parser.add_argument(
+        "-t", "--timeout",
+        dest="timeout",
+        type=int,
+        metavar="SECONDS",
+        default=None,
+        help="单步超时秒数（默认 3600）。可设环境变量 CODINGPLAN_STEP_TIMEOUT",
+    )
+    parser.add_argument(
         "-v", "--version",
         action="version",
         version=f"%(prog)s {__version__}",
     )
 
     args = parser.parse_args()
+    if args.timeout is not None:
+        os.environ["CODINGPLAN_STEP_TIMEOUT"] = str(max(60, args.timeout))
 
     if not args.req_dir:
         parser.error("请指定需求目录，或使用 'codingplan init' 创建邮件配置模板")

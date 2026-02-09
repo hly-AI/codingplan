@@ -3,7 +3,10 @@
 import subprocess
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Optional
+
+from .logger import get_step_timeout_seconds
 
 
 def check_agent_installed() -> bool:
@@ -25,6 +28,7 @@ def run_agent(
     mode: str = "plan",
     force: bool = True,
     output_format: str = "text",
+    timeout: Optional[int] = None,
 ) -> subprocess.CompletedProcess:
     """
     调用 Cursor Agent 执行任务
@@ -35,6 +39,7 @@ def run_agent(
         mode: plan | ask（Cursor CLI 仅支持此两种模式，plan 可修改文件，ask 只读）
         force: 是否允许直接修改文件（非交互模式必需）
         output_format: text | json | stream-json
+        timeout: 超时秒数，None 时使用环境变量 CODINGPLAN_STEP_TIMEOUT（默认 3600）
 
     Returns:
         subprocess.CompletedProcess
@@ -52,12 +57,19 @@ def run_agent(
     if force:
         cmd.append("--force")
 
-    return subprocess.run(
-        cmd,
-        cwd=cwd or Path.cwd(),
-        capture_output=False,  # 直接输出到终端，便于用户观察
-        text=True,
-    )
+    timeout_sec = timeout if timeout is not None else get_step_timeout_seconds()
+    try:
+        return subprocess.run(
+            cmd,
+            cwd=cwd or Path.cwd(),
+            capture_output=False,  # 直接输出到终端，便于用户观察
+            text=True,
+            timeout=timeout_sec,
+        )
+    except subprocess.TimeoutExpired:
+        print(f"\n[超时] 本步骤已运行超过 {timeout_sec} 秒，已终止。"
+              f" 可通过环境变量 CODINGPLAN_STEP_TIMEOUT 调整（秒）")
+        return SimpleNamespace(returncode=124)
 
 
 def run_plan(prompt: str, cwd: Optional[Path] = None) -> subprocess.CompletedProcess:
